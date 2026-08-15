@@ -1,0 +1,9 @@
+# Versions used for the runs reported in the manuscript (Python 3.14.5).
+# Lower bounds rather than pins: nothing here depends on a version-specific
+# behaviour, and verify_reported_values.py will say so if that stops being true.
+numpy>=2.0
+scipy>=1.11
+sympy>=1.12
+matplotlib>=3.8
+pandas>=2.0
+pyarrow>=15.0

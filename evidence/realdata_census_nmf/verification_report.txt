@@ -1,0 +1,35 @@
+=== Census 2020 NMF real-data study ===
+
+-- Gate N1: declared noise variance == actual noise variance,
+   and noise independent across queries (nothing is fitted) --
+  [PASS] hispanic_dpq       ratio=0.9857  mean_diff=+0.096 (se 0.474)
+  [PASS] votingage_dpq      ratio=0.9675  mean_diff=+0.446 (se 0.469)
+  [PASS] hhgq_dpq           ratio=1.0053  mean_diff=+0.272 (se 0.957)
+  [PASS] cenrace_dpq        ratio=0.9806  mean_diff=+0.387 (se 2.651)
+  [PASS] hhinstlevels_dpq   ratio=0.9712  mean_diff=+0.169 (se 0.576)
+
+-- A_white_nh_on_total  (U-side verification and the Cov(X,eps^2) bias formula) --
+  n=3776  counties=84  lambda=0.9639  varsigma=0.452
+  eps: c3=-1.651 c4=+2.202 -> g2=0.3512; g2_EIV=0.3732; ARE(transplanted)=0.3733
+  [PASS] U-side: nu2 ratio=0.9982, skew=+0.0091, exkurt=+0.0312, corr(U,X)=+0.0033, corr(U^2,X)=+0.0076, corr(U,eps)=+0.0159
+  [FAIL] eps-side: corr(eps^2,X)=+0.2056, corr(eps^3,X)=-0.1330, spearman p=5.30e-103
+  score at the gold beta: linear z=(+0.08, +0.11);  degree-two z=(-0.02, +3.36)
+  bias formula  E[Psi1] = -b Cov(X,eps^2):  measured +15508.9  predicted +15574.3  ratio=0.9958
+  Cov(X,eps^2) from observables only = 1.246e+07 (se 6.2e+03)  vs gold-standard 1.264e+07   ratio=0.9860
+  implied slope bias +0.168959  vs observed +0.176356
+  beta1: gold=+0.69066  naive=+0.66839  tc_ls=+0.69342  tc_pmm2=+0.87033  tc_pmm2star=+0.86701
+  Var(star)/Var(tc_ls) = 0.4373  (predicted g2_EIV = 0.3732)
+  county bootstrap (84 clusters): star-gold 95% CI [+0.06931, +0.22287]
+
+-- B_votingage_on_total  (real-data check of the negative result: transplanted weights lose) --
+  n=5557  counties=88  lambda=0.6594  varsigma=16.448
+  eps: c3=-0.172 c4=+2.881 -> g2=0.9939; g2_EIV=1.0000; ARE(transplanted)=1.0283
+  [PASS] U-side: nu2 ratio=0.9899, skew=-0.0167, exkurt=+0.0351, corr(U,X)=+0.0100, corr(U^2,X)=+0.0017, corr(U,eps)=+0.0014
+  [FAIL] eps-side: corr(eps^2,X)=+0.2803, corr(eps^3,X)=-0.0127, spearman p=2.03e-80
+  score at the gold beta: linear z=(-1.16, -1.06);  degree-two z=(-1.16, -1.06)
+  bias formula  E[Psi1] = -b Cov(X,eps^2):  measured -5573.9  predicted +14.8  ratio=-377.1899   [not informative: t_opt ~ 0, the degree-two score collapses onto the linear one]
+  Cov(X,eps^2) from observables only = 1.193e+06 (se 1.1e+06)  vs gold-standard 2.194e+06   ratio=0.5441
+  implied slope bias -0.001156  vs observed -0.001156
+  beta1: gold=+0.77047  naive=+0.50878  tc_ls=+0.76928  tc_pmm2=+0.77152  tc_pmm2star=+0.76931
+  Var(star)/Var(tc_ls) = 1.0002  (predicted g2_EIV = 1.0000)
+  county bootstrap (88 clusters): star-gold 95% CI [-0.02870, +0.02179]

@@ -1,0 +1,101 @@
+{
+  "nmf_source": "https://uscb-2020-product-releases.s3.us-west-2.amazonaws.com/decennial/redistricting/2020/nmf/2020-pl94-nmf-state-partitioned/US_Person_PL_PROD/Tract.parquet/DPQuery/",
+  "svi_source": "https://svi.cdc.gov/Documents/Data/2020/csv/states/{}.csv",
+  "states": [
+    [
+      "039",
+      "Ohio"
+    ],
+    [
+      "042",
+      "Pennsylvania"
+    ],
+    [
+      "026",
+      "Michigan"
+    ],
+    [
+      "018",
+      "Indiana"
+    ],
+    [
+      "017",
+      "Illinois"
+    ],
+    [
+      "037",
+      "NorthCarolina"
+    ],
+    [
+      "013",
+      "Georgia"
+    ],
+    [
+      "047",
+      "Tennessee"
+    ],
+    [
+      "029",
+      "Missouri"
+    ],
+    [
+      "055",
+      "Wisconsin"
+    ],
+    [
+      "027",
+      "Minnesota"
+    ]
+  ],
+  "responses": [
+    "EP_POV150",
+    "EP_UNEMP",
+    "EP_NOHSDP",
+    "EP_UNINSUR",
+    "EP_HBURD",
+    "EP_CROWD",
+    "EP_NOVEH",
+    "EP_MOBILE",
+    "EP_LIMENG",
+    "EP_AGE65",
+    "EP_DISABL",
+    "EP_SNGPNT",
+    "EP_MUNIT",
+    "EP_GROUPQ"
+  ],
+  "band": [
+    2500,
+    5500
+  ],
+  "discovery": "Ohio",
+  "headline": [
+    "Michigan",
+    "Black_NH",
+    "EP_MOBILE"
+  ],
+  "files": {
+    "tract_039.parquet": "5a0e2fae9fe29ed0c407150b9fbc2be5b0bc0b3e9d01b5a2258f6070be908195",
+    "svi_Ohio.csv": "7734bb64b2d5d9ff3310071d59c961df809f059726c38375ba1aa5b69f5ba72e",
+    "tract_042.parquet": "b966e814999a0cd1967a0052e3fd0d6bc47b3185c42b61a14cdf8eb804a41e33",
+    "svi_Pennsylvania.csv": "71e5e7246b488dabc9a898e34e6dd60d308c2af69472c11ea25b44d65d07af25",
+    "tract_026.parquet": "2db5661b749fe096766a9b1377b6f577572e90f40a6650720e183157fa58ecb1",
+    "svi_Michigan.csv": "83b47329ad504efeb89ecf72daafb13a1be8ffd135fb3157f11ee7248485cef0",
+    "tract_018.parquet": "7bcbc5d2c73df9036dfeca152253d713d587a30868b647b98bc204c0713a3ccd",
+    "svi_Indiana.csv": "2949de2bd89f044a7efd8f28e9c80a54886b42dd7a653a86490dd0663c8a42af",
+    "tract_017.parquet": "7665f1b05bbe035b749d5216ddb82cb260b7096c307dafea317cb2566a5acad2",
+    "svi_Illinois.csv": "2ec6c7b04486e2691cef3b9a3f5cd8ac971bce88a3ffa6f7282a11ad4da6dd77",
+    "tract_037.parquet": "c579a72d0149562e4b84da46fe6efd8faad9d66f5d62ec4bbd3788c817caa4c0",
+    "svi_NorthCarolina.csv": "c090133d5087f2c812d0236c038d3d7dfc4b3bc5866d9335b9d5e3790de5a400",
+    "tract_013.parquet": "2b5827a2b1eb3bceae0a99cdcc431565a2d655180c78fcd1cd3a7e7245cdf4f5",
+    "svi_Georgia.csv": "f297a4ebfc8d334e890e18320d2caed2346bf0def17812cce3c72fbcb225bdaf",
+    "tract_047.parquet": "bf2622fc85a6c088719e1b26fd44126aa0b246eb4adba38e515beddc6f88f3e4",
+    "svi_Tennessee.csv": "f492adc730cac711e91d96d812a0cb5097a656c80126347a017de09fca0bf6fc",
+    "tract_029.parquet": "5520d3c4d7a99a591510137f4c668e29a43e1c94b5916e1ef0e479abe7dfaead",
+    "svi_Missouri.csv": "2d2e670427776bd160a2e8297060ea5cecfffc30fa5b853015bb5cc4a39c6067",
+    "tract_055.parquet": "b050769622d279bc3da2f026a0a1f29b413e165ccc93d68423e7b1f513f16625",
+    "svi_Wisconsin.csv": "f35e8a2cd548fc4018812b01b288e421accb275b96d302ff5648aedb8f957312",
+    "tract_027.parquet": "4cc43bca954e3af99fdba10d69ecb17fd48f3175d7f4777c6ee4f9c1eceb837d",
+    "svi_Minnesota.csv": "f7691c1211b278e1590072623cdb09a3ac2f3ab4b82ce0952f66480086a47bf3"
+  },
+  "boot": 400
+}

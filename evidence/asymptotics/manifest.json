@@ -1,0 +1,8 @@
+{
+  "mode": "asymptotics",
+  "git_hash": "2785ff7588ae91a56e85d0a93aec9da64861336c",
+  "python": "<repo>/.venv/bin/python",
+  "numpy": "2.5.2",
+  "n_rows": 1944,
+  "note": "closed-form ARE (eq. 4.1, blocks 3.1-3.3), typed independently in estimators.are_blocks and asserted equal to theory/are_formulas.scalars by verify.py; closed_form_validation.csv compares it against a 2e6-sample empirical sandwich"
+}

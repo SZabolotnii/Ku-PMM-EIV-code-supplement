@@ -1,0 +1,47 @@
+[
+  {
+    "query": "hispanic_dpq",
+    "ncells": 2,
+    "var_diff_measured": 3441.8947746496174,
+    "var_diff_predicted": 3491.8669307231903,
+    "ratio": 0.985688986131203,
+    "mean_diff": 0.09600208700189135,
+    "mean_diff_se": 0.47378927622499745
+  },
+  {
+    "query": "votingage_dpq",
+    "ncells": 2,
+    "var_diff_measured": 3378.3750570622046,
+    "var_diff_predicted": 3491.8669307231903,
+    "ratio": 0.9674982249001451,
+    "mean_diff": 0.4459009978477793,
+    "mean_diff_se": 0.4693970578626359
+  },
+  {
+    "query": "hhgq_dpq",
+    "ncells": 8,
+    "var_diff_measured": 14032.298407112685,
+    "var_diff_predicted": 13958.259752988815,
+    "ratio": 1.0053042897491584,
+    "mean_diff": 0.27157112111132853,
+    "mean_diff_se": 0.9566450706042987
+  },
+  {
+    "query": "cenrace_dpq",
+    "ncells": 63,
+    "var_diff_measured": 107770.11722319512,
+    "var_diff_predicted": 109900.19395709038,
+    "ratio": 0.9806180803035986,
+    "mean_diff": 0.38694319441726993,
+    "mean_diff_se": 2.651157992718292
+  },
+  {
+    "query": "hhinstlevels_dpq",
+    "ncells": 3,
+    "var_diff_measured": 5085.424374230801,
+    "var_diff_predicted": 5236.265734434128,
+    "ratio": 0.9711929516465558,
+    "mean_diff": 0.1689167155807735,
+    "mean_diff_se": 0.5759039168807264
+  }
+]

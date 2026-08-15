@@ -1,0 +1,31 @@
+block,key,value,lo,hi,note
+estimator,naive_ls,0.013577951441312281,0.0118256248932653,0.0153301709157273,"cluster-bootstrap SE 0.000906228, sandwich SE 0.000706699"
+estimator,tc_ls,0.015530850667149784,0.01362200847920924,0.017473226343723596,"cluster-bootstrap SE 0.00100936, sandwich SE 0.000815638"
+estimator,tc_pmm2,0.014045292929511564,0.01258719629141867,0.015458335746550563,"cluster-bootstrap SE 0.000738209, sandwich SE 0.000668636"
+estimator,tc_pmm2star,0.014073329129002304,0.01260670232788079,0.015504112537012789,"cluster-bootstrap SE 0.000746146, sandwich SE 0.000668958"
+estimator,tc_pmm2star_adaptive,0.01406029926332975,0.012597996048742234,0.015481351647963765,"cluster-bootstrap SE 0.000741206, sandwich SE 0.000668796"
+quantity,lam,0.8742787174352529,0.8651630973358896,0.8838625869195955,"reading-adjusted, regression sample, n = 5731"
+quantity,nu2,18.4692632828712,16.46378616966152,20.534776930309803,"reading-adjusted, regression sample, n = 5731"
+quantity,nu3,-29.41155344036027,-52.290048163044446,-7.288310179845852,"reading-adjusted, regression sample, n = 5731"
+quantity,nu4,5059.408163974234,2748.340757682038,7421.98932475754,"reading-adjusted, regression sample, n = 5731"
+quantity,nu5,-37905.584429070586,-86911.07921688799,7516.160089288629,"reading-adjusted, regression sample, n = 5731"
+quantity,nu6,6714910.732881919,1482539.0078621383,11965323.722441072,"reading-adjusted, regression sample, n = 5731"
+quantity,gamma3_u,-0.3705472589102357,-0.6261724002729171,-0.0969365895573124,"reading-adjusted, regression sample, n = 5731"
+quantity,gamma4_u,11.832029228019987,nan,nan,"reading-adjusted, regression sample, n = 5731"
+quantity,c3,1.2916612482814072,nan,nan,"reading-adjusted, regression sample, n = 5731"
+quantity,c4,3.4811664275955394,nan,nan,"reading-adjusted, regression sample, n = 5731"
+quantity,g2,0.6956142816769447,0.6757082681358624,0.7161913465472824,"reading-adjusted, regression sample, n = 5731"
+quantity,g2_eiv,0.7066162208822024,0.6849659741003739,0.7296209375993906,"reading-adjusted, regression sample, n = 5731"
+quantity,t_fixed,0.37654642861925075,0.35979235129076464,0.40052453163575874,"reading-adjusted, regression sample, n = 5731"
+quantity,t_opt,0.3697035767939986,0.3536862339418647,0.39208372609809344,"reading-adjusted, regression sample, n = 5731"
+quantity,signal_ratio,0.07909826304450725,nan,nan,"reading-adjusted, regression sample, n = 5731"
+quantity,sx2,128.43715467670873,nan,nan,"reading-adjusted, regression sample, n = 5731"
+quantity,var_w,146.90641795957993,nan,nan,"reading-adjusted, regression sample, n = 5731"
+quantity,m2,0.3916645067747028,nan,nan,"reading-adjusted, regression sample, n = 5731"
+efficiency,observed_ratio_star_tcls,0.5464529831781658,0.2554939818639834,0.8374119844923482,cluster-bootstrap variance ratio
+efficiency,observed_ratio_fixed_tcls,0.5348890085667588,0.24390771933299377,0.8258702978005239,cluster-bootstrap variance ratio
+specification,gap_tcls_minus_star,0.0014575215381474795,0.0008084454868718474,0.0021487379817999343,"z = 4.18; over-identification contrast, not an efficiency result"
+specification,gap_z,4.177736028831378,nan,nan,cluster-bootstrap z of the previous row
+design,n_obs,5731.0,nan,nan,subjects
+design,n_psu,30.0,nan,nan,"PSUs, the resampling unit"
+design,n_strata,15.0,nan,nan,strata

@@ -1,0 +1,425 @@
+{
+  "tables": {
+    "tab_application.tex": {
+      "what": "The five estimators on the NHANES application, with cluster-bootstrap standard errors and intervals, the recovered measurement-error moments, the two weight ratios and the two efficiency coefficients.",
+      "sources": [
+        {
+          "file": "evidence/realdata_nhanes/estimates.csv",
+          "columns": [
+            "beta1",
+            "se_cluster",
+            "ci_lo",
+            "ci_hi",
+            "se_sandwich",
+            "var_ratio_cluster"
+          ],
+          "filter": "all five estimators; the ratio column is the bootstrap variance divided by that of TC-LS over the same resamples"
+        },
+        {
+          "file": "evidence/realdata_nhanes/summary.csv",
+          "columns": [
+            "value"
+          ],
+          "filter": "the quantity, design and specification blocks"
+        },
+        {
+          "file": "evidence/realdata_nhanes/efficiency.csv",
+          "columns": [
+            "value",
+            "ci_lo",
+            "ci_hi"
+          ],
+          "filter": "the TC-PMM2*:TC-LS cluster-bootstrap ratio"
+        }
+      ],
+      "aggregation": "none; every entry is an evidence row. Intervals are percentile intervals of the stratified cluster bootstrap; the variance-ratio interval is a delete-one-stratum jackknife, because with 15 strata the ratio itself is the poorly determined quantity.",
+      "rows": 5
+    },
+    "tab_bias.tex": {
+      "what": "Bias of the slope estimator, contrasting the two uncorrected estimators (naive LS, naive PMM2) with the corrected ones; the naive-PMM2 column shows that PMM2 on its own makes the EIV bias worse rather than better.",
+      "sources": [
+        {
+          "file": "evidence/confirmatory/summary.csv",
+          "columns": [
+            "bias",
+            "se_bias"
+          ],
+          "filter": "param='b1'; n=1000; b1_true=+1; delta=0; u_family in {gamma_wh,gamma_fixed}; lam in {0.80,0.90,0.95}; eps_key in {gauss,g_c3_0.5,g_c3_1.0,g_c3_1.5}; estimator in ['naive_ls', 'naive_pmm2', 'tc_ls', 'tc_pmm2_oracle', 'tc_pmm2star_oracle', 'tc_pmm2star_adaptive']"
+        }
+      ],
+      "aggregation": "none for the estimator columns; values are rounded to four decimals, which is finer than the Monte Carlo standard error of any entry. The \"attenuation\" column is the textbook -(1-lambda)*beta_1 evaluated at the row's own lam and b1_true from the same evidence rows; the closing line is the largest se_bias over every cell and estimator in the table.",
+      "labels": "column U: 'W&H' = gamma of shape 4(1-lambda)/lambda, scale 1/2 (Woolsey-Huang design); 'k=4' = gamma of fixed shape 4 with the scale set by nu_2. Row c_3(eps) = 0 is the Gaussian control, where eps ~ N(0,1) rather than a centred gamma. The wrapping caption should spell both of these out.",
+      "rows": 24
+    },
+    "tab_coverage.tex": {
+      "what": "Empirical coverage of the nominal 95% sandwich confidence interval for the slope, by estimator, with naive LS as the contrast.",
+      "sources": [
+        {
+          "file": "evidence/confirmatory/summary.csv",
+          "columns": [
+            "coverage",
+            "se_coverage"
+          ],
+          "filter": "param='b1'; delta=0; n >= 500; u_family in {gamma_wh,gamma_fixed} -- exactly the selection gate G4 applies; estimator in ['tc_ls', 'tc_pmm2_oracle', 'tc_pmm2_adaptive', 'tc_pmm2star_oracle', 'tc_pmm2star_adaptive', 'naive_ls']"
+        }
+      ],
+      "aggregation": "min / mean / max of the per-cell coverage over the 96 qualifying cells, plus the largest per-cell Monte Carlo standard error of a coverage rate. Gate G4 requires every cell in [93, 97]%.",
+      "rows": 6
+    },
+    "tab_gates.tex": {
+      "what": "The pre-registered verification gates with their status and the number of sub-checks passed.",
+      "sources": [
+        {
+          "file": "evidence/confirmatory/verification_report.txt",
+          "columns": [
+            "the [PASS]/[FAIL] gate headings and the closing summary block"
+          ],
+          "filter": "all gates in the order printed by scripts/verify.py: G0, G0b, C1, G1, G2, G2b, G3, G4, G5, G6"
+        }
+      ],
+      "aggregation": "the report is parsed, not re-derived: gate names, statuses, descriptions and x/y sub-check counts are taken verbatim from the machine-written report, so the table cannot drift from the run that produced it.",
+      "rows": 10,
+      "gates_passed": "7/10"
+    },
+    "tab_lambda_star.tex": {
+      "what": "Break-even reliability lambda* at which the fixed-weight TC-PMM2 stops losing to TC-LS: Monte Carlo estimate against the closed form. TC-PMM2* has no break-even (ARE* <= 1 for every lambda).",
+      "sources": [
+        {
+          "file": "evidence/lambda_star/paired.csv",
+          "columns": [
+            "lam",
+            "re"
+          ],
+          "filter": "estimator_a='tc_pmm2_oracle'; estimator_b='tc_ls'; param='b1'; delta=0; eps_key != 'gauss' (ARE is identically 1 there, so no crossing exists); n=1000; lam grid [0.86, 0.88, 0.9, 0.92, 0.94, 0.95, 0.96, 0.97, 0.98]"
+        },
+        {
+          "file": "evidence/asymptotics/lambda_star_theory.csv",
+          "columns": [
+            "lambda_star_theory"
+          ],
+          "filter": "joined on (eps_key, u_family, b1); blank means the closed-form ARE never crosses 1"
+        }
+      ],
+      "aggregation": "lambda* is obtained by linear interpolation between the two adjacent grid reliabilities whose measured RE brackets 1 -- byte-for-byte the rule used by scripts/verify.py, so the table reproduces the verification report.",
+      "rows": 12
+    },
+    "tab_lognormal.tex": {
+      "what": "The numbers behind fig6: convergence, bias, MSE and MSE ratio against TC-LS for both estimators in oracle and adaptive form under lognormal measurement error, with the gate G6 counts.",
+      "sources": [
+        {
+          "file": "evidence/confirmatory/summary.csv",
+          "columns": [
+            "conv_rate",
+            "bias",
+            "se_bias",
+            "mse",
+            "adapt_clip_rate"
+          ],
+          "filter": "u_family='lognormal'; param='b1'; delta=0; table body: eps_key='g_c3_1.0', n=1000, lam in {0.80,0.90,0.95}, b1_true in {+1,-1}; G6 footer: all 36 lognormal cells (both eps_key, n in {250,500,1000}, both b1_true)"
+        },
+        {
+          "file": "evidence/confirmatory/paired.csv",
+          "columns": [
+            "re",
+            "are_fixed_theory",
+            "are_star_theory"
+          ],
+          "filter": "same body cells; estimator_b='tc_ls'"
+        },
+        {
+          "file": "evidence/confirmatory/verification_report.txt",
+          "columns": [
+            "the G6 sub-check count"
+          ],
+          "filter": "used only as an assertion target -- see aggregation"
+        }
+      ],
+      "aggregation": "Body rows are copied verbatim, one per cell and estimator. The G6 footer re-applies the gate rule of scripts/verify.py (defined = convergence >= 99% and finite bias; unbiased = |bias| <= max(0.25|bias of naive PMM2|, 2 SE)) and splits it per estimator into G6a \"defined\" and G6b \"defined and unbiased\". The script asserts that the two oracle variants reproduce the 52/72 recorded in verification_report.txt, so the split cannot drift from the gate it decomposes.",
+      "note": "eps_key=g_c3_1.5 behaves materially the same and is omitted from the body for width; it is included in the G6 footer counts. The ARE column for the fixed-weight rows is far above the measured ratio (104.47 against 13.720 at lam=0.80) because an estimator that fails to converge in part of the sample is not described by its own asymptotics; the G2 gate never covered this design.",
+      "rows": 30
+    },
+    "tab_main_re.tex": {
+      "what": "Measured relative efficiency against TC-LS with its Monte Carlo standard error, next to the closed-form ARE, for both the transplanted-weight TC-PMM2 and TC-PMM2*.",
+      "sources": [
+        {
+          "file": "evidence/confirmatory/paired.csv",
+          "columns": [
+            "re",
+            "se_re",
+            "are_fixed_theory",
+            "are_star_theory"
+          ],
+          "filter": "param='b1'; n=1000; delta=0; estimator_b='tc_ls'; estimator_a in {tc_pmm2_oracle,tc_pmm2star_oracle}; eps_key in {g_c3_0.5,g_c3_1.0,g_c3_1.5}; u_family in {gamma_wh,gamma_fixed}; b1_true in {+1,-1}; lam in {0.80,0.90,0.95}"
+        },
+        {
+          "file": "evidence/confirmatory/summary.csv",
+          "columns": [
+            "g2_theory"
+          ],
+          "filter": "same cells, estimator='tc_ls', param='b1'"
+        }
+      ],
+      "aggregation": "none; one row per cell, values copied verbatim. RE values above 1 (TC-PMM2 worse than TC-LS) are set in bold.",
+      "rows": 36
+    },
+    "tab_validation.tex": "evidence/realdata_nmf_svi/summary.json"
+  },
+  "_about": "Audit trail for the figures and tables of the TC-PMM2 EIV paper. Every entry names the evidence files a panel or column was read from and the filter applied. Produced by scripts/make_figures.py and scripts/make_tables.py; nothing here is computed from raw data or typed by hand.",
+  "_evidence_runs": {
+    "confirmatory": "M=2000, 180 cells, n in {250,500,1000}, lam in {0.80,0.90,0.95}",
+    "lambda_star": "M=2000, 108 cells, n=1000, lam in {0.86,...,0.98}; identical to confirmatory on the 432 shared summary cells (max |difference| = 0), so the two grids may be unioned",
+    "sensitivity": "M=2000, 28 cells, n=1000, delta in {0.0,...,0.6}",
+    "asymptotics": "closed form only, 1944 rows, lam grid 0.600-0.999"
+  },
+  "figures": {
+    "fig1_are_theory_vs_mc.pdf": {
+      "what": "ARE vs reliability, closed form (lines) and Monte Carlo (points), for fixed-weight TC-PMM2 and TC-PMM2*, 2x2 over U design x sign(beta1).",
+      "sources": [
+        {
+          "file": "evidence/asymptotics/asymptotic_are.csv",
+          "columns": [
+            "lam",
+            "are_fixed",
+            "are_star",
+            "g2"
+          ],
+          "filter": "eps_key='g_c3_1.0'; u_family in {gamma_wh,gamma_fixed}; b1 in {+1,-1}; full lam grid 0.600-0.999 (81 points)"
+        },
+        {
+          "file": "evidence/confirmatory/paired.csv",
+          "columns": [
+            "lam",
+            "re",
+            "re_boot_lo",
+            "re_boot_hi"
+          ],
+          "filter": "eps_key='g_c3_1.0'; param='b1'; n=1000; delta=0; estimator_b='tc_ls'; estimator_a in {tc_pmm2_oracle,tc_pmm2star_oracle}; lam in {0.80,0.90,0.95}"
+        },
+        {
+          "file": "evidence/lambda_star/paired.csv",
+          "columns": [
+            "lam",
+            "re",
+            "re_boot_lo",
+            "re_boot_hi"
+          ],
+          "filter": "same selection; lam in {0.86,0.88,0.90,0.92,0.94,0.95,0.96,0.97,0.98}; union with confirmatory, duplicates (lam=0.90,0.95) resolved to the confirmatory row -- the two runs are numerically identical on shared cells (CRN seeding)"
+        },
+        {
+          "file": "evidence/confirmatory/paired.csv",
+          "columns": [
+            "lam",
+            "re",
+            "re_boot_lo",
+            "re_boot_hi"
+          ],
+          "filter": "panel (b) only (u_family='gamma_wh', b1_true=-1): the same estimator_a='tc_pmm2star_oracle' selection repeated at n=250 and n=500, plotted in lighter grey to show the finite-sample offset shrinking with n"
+        }
+      ],
+      "aggregation": "none; one plotted point per evidence row. Error bars are the stored paired bootstrap 95% CI (B=2000, resampling unit = MC replication), drawn as re-re_boot_lo / re_boot_hi-re.",
+      "note": "The systematic offset of the TC-PMM2* markers above their curve in the b1=-1 panels is the finite-sample deviation recorded by gate G2 (11/144 sub-checks outside 2 SE, |z| <= 3.14, 5 of them at n=250 and 2 at n=1000; evidence/confirmatory/verification_report.txt). It is not a plotting artefact and no smoothing is applied."
+    },
+    "fig2_bias_mse_iqr.pdf": {
+      "what": "Woolsey-Huang Figures 1-2 layout: 2 rows (beta0, beta1) x 3 columns (bias, MSE, IQR) against reliability, for naive LS, TC-LS, fixed-weight TC-PMM2, TC-PMM2* and the error-free LS reference.",
+      "sources": [
+        {
+          "file": "evidence/confirmatory/summary.csv",
+          "columns": [
+            "lam",
+            "bias",
+            "mse",
+            "iqr"
+          ],
+          "filter": "eps_key='g_c3_1.0'; u_family='gamma_wh'; b1_true=+1; n=1000; delta=0; param in {b0,b1}; estimator in {naive_ls,tc_ls,tc_pmm2_oracle,tc_pmm2star_oracle,ref_ls}; lam in {0.80,0.90,0.95}"
+        },
+        {
+          "file": "evidence/lambda_star/summary.csv",
+          "columns": [
+            "lam",
+            "bias",
+            "mse",
+            "iqr"
+          ],
+          "filter": "same selection; lam in {0.86,...,0.98}; union with confirmatory as in fig1"
+        }
+      ],
+      "aggregation": "none; the summary rows are already the M=2000 Monte Carlo moments of the cell. MSE panels use a log ordinate.",
+      "note": "ref_ls is the LS fit on the unobserved true X (error-free reference); tc_pmm2_oracle / tc_pmm2star_oracle are the known-moment (oracle) variants."
+    },
+    "fig3_weight_ratio.pdf": {
+      "what": "Optimal weight ratio t_opt(lambda) against the transplanted PMM2 value t = m3/(m4-m2^2), with the zero line; the negative-t_opt region is shaded.",
+      "sources": [
+        {
+          "file": "evidence/asymptotics/asymptotic_are.csv",
+          "columns": [
+            "lam",
+            "t_opt",
+            "t_fixed"
+          ],
+          "filter": "eps_key='g_c3_1.0'; u_family in {gamma_wh,gamma_fixed}; b1 in {+1,-1}; full lam grid 0.600-0.999"
+        },
+        {
+          "file": "evidence/confirmatory/summary.csv + evidence/lambda_star/summary.csv",
+          "columns": [
+            "lam",
+            "star_t_oracle_mean"
+          ],
+          "filter": "eps_key='g_c3_1.0'; n=1000; delta=0; estimator='tc_pmm2star_oracle'; param='b1'; union of the two runs as in fig1"
+        }
+      ],
+      "aggregation": "star_t_oracle_mean is the mean over the M=2000 replications of the t actually used by TC-PMM2* in that cell (stored per cell by the MC engine).",
+      "headline_numbers": "gamma_wh, lam=0.80, b1=+1: t_opt = -0.061 vs transplanted +0.285714 (both read from the CSVs above)."
+    },
+    "fig4_sensitivity.pdf": {
+      "what": "Degradation of bias, MSE and IQR of the slope as the assumed U moments are misspecified, for TC-LS, fixed-weight TC-PMM2 and TC-PMM2*; four (U design, lambda) rows.",
+      "sources": [
+        {
+          "file": "evidence/sensitivity/summary.csv",
+          "columns": [
+            "delta",
+            "bias",
+            "mse",
+            "iqr"
+          ],
+          "filter": "eps_key='g_c3_1.0'; n=1000; b1_true=+1; param='b1'; u_family in {gamma_wh,gamma_fixed}; lam in {0.80,0.95}; delta in {0.0,0.1,0.2,0.3,0.4,0.5,0.6}; estimator in {tc_ls,tc_pmm2_oracle,tc_pmm2star_oracle}"
+        }
+      ],
+      "aggregation": "none; one point per evidence row (28 cells x 3 estimators)."
+    },
+    "fig5_gaussian_eps.pdf": {
+      "what": "Gaussian regression error: fixed-weight TC-PMM2 collapses onto TC-LS (ARE identically 1) while TC-PMM2* still reduces variance, the gain being driven by the skewness of the measurement error.",
+      "sources": [
+        {
+          "file": "evidence/asymptotics/asymptotic_are.csv",
+          "columns": [
+            "lam",
+            "are_fixed",
+            "are_star"
+          ],
+          "filter": "eps_key='gauss'; u_family in {gamma_wh,gamma_fixed}; b1=+1 (are_fixed is identically 1 and are_star is numerically identical for b1=-1: max |difference| = 0 over the grid)"
+        },
+        {
+          "file": "evidence/confirmatory/paired.csv",
+          "columns": [
+            "lam",
+            "re",
+            "re_boot_lo",
+            "re_boot_hi"
+          ],
+          "filter": "eps_key='gauss'; param='b1'; n=1000; delta=0; estimator_b='tc_ls'; estimator_a in {tc_pmm2_oracle,tc_pmm2star_oracle}; b1_true in {+1,-1}; lam in {0.80,0.90,0.95}"
+        }
+      ],
+      "aggregation": "none; error bars are the stored paired bootstrap 95% CI. The lambda_star run contains no Gaussian-epsilon cells, so the MC grid here is the three confirmatory reliabilities."
+    },
+    "fig6_lognormal.pdf": {
+      "what": "The heavy-tailed regime of gate G6: convergence rate, bias and MSE ratio against TC-LS for the transplanted-weight and re-optimised estimators, oracle and adaptive, under lognormal measurement error.",
+      "sources": [
+        {
+          "file": "evidence/confirmatory/summary.csv",
+          "columns": [
+            "lam",
+            "conv_rate",
+            "bias",
+            "adapt_clip_rate"
+          ],
+          "filter": "u_family='lognormal'; eps_key='g_c3_1.0'; n=1000; delta=0; param='b1'; b1_true in {+1,-1}; lam in {0.80,0.90,0.95}; estimator in {tc_ls, tc_pmm2_oracle, tc_pmm2_adaptive, tc_pmm2star_oracle, tc_pmm2star_adaptive}"
+        },
+        {
+          "file": "evidence/confirmatory/paired.csv",
+          "columns": [
+            "re",
+            "re_boot_lo",
+            "re_boot_hi"
+          ],
+          "filter": "same cells; estimator_b='tc_ls'; estimator_a in the four TC-PMM2 variants"
+        },
+        {
+          "file": "evidence/confirmatory/manifest.json",
+          "columns": [
+            "cells[].u_skew",
+            "cells[].u_exkurt"
+          ],
+          "filter": "first cell with u_family='lognormal'; used only for the skewness and excess kurtosis quoted in the figure title"
+        }
+      ],
+      "aggregation": "none; one plotted point per evidence row. adapt_clip_rate is a per-cell diagnostic shared by both adaptive variants, read from the tc_ls row of the cell. The bottom row uses a logarithmic ordinate: the plotted quantity is a ratio, and a log scale is the only one that treats \"twice as good\" and \"twice as bad\" symmetrically about 1.",
+      "note": "The closed-form ARE of the fixed-weight estimator in these cells is far larger than the measured MSE ratio (104.5 against 13.7 at lam=0.80); the figure shows the measured quantity only, and the discrepancy is reported in tab_lognormal.tex, since an estimator that fails to converge in part of the sample is not described by its own asymptotics."
+    },
+    "fig7_application.pdf": {
+      "what": "The NHANES application: (a) the distribution of the within-subject deviations that identify the measurement-error moments, against its own mirror image; (b) the closed-form efficiency as a quadratic in the weight ratio, with the transplanted and optimal weights, g_2, g_2^EIV and the observed cluster-bootstrap ratio; (c) the two independence assumptions tested by level.",
+      "sources": [
+        {
+          "file": "evidence/realdata_nhanes/deviation_hist.csv",
+          "columns": [
+            "left",
+            "right",
+            "count"
+          ],
+          "filter": "all bins; the histogram is of d = W_ij - Wbar_i after removing the reading-number means, k = 3"
+        },
+        {
+          "file": "evidence/realdata_nhanes/are_curve.csv",
+          "columns": [
+            "t",
+            "are"
+          ],
+          "filter": "closed-form ARE(t) at the recovered moments, t in [-0.2, 0.95]"
+        },
+        {
+          "file": "evidence/realdata_nhanes/summary.csv",
+          "columns": [
+            "g2",
+            "g2_eiv",
+            "t_fixed",
+            "t_opt",
+            "n_obs",
+            "n_psu",
+            "n_strata"
+          ]
+        },
+        {
+          "file": "evidence/realdata_nhanes/efficiency.csv",
+          "columns": [
+            "value",
+            "ci_lo",
+            "ci_hi"
+          ],
+          "filter": "the TC-PMM2*:TC-LS cluster-bootstrap ratio and its delete-one-stratum jackknife interval"
+        },
+        {
+          "file": "evidence/realdata_nhanes/independence.csv",
+          "columns": [
+            "level",
+            "nu2_rel",
+            "m2_rel"
+          ]
+        },
+        {
+          "file": "evidence/realdata_nhanes/moment_intervals.csv",
+          "columns": [
+            "point",
+            "ci_lo",
+            "ci_hi"
+          ],
+          "filter": "quantity='gamma3_u'"
+        },
+        {
+          "file": "evidence/realdata_nhanes/diagnostics.csv",
+          "columns": [
+            "stat"
+          ],
+          "filter": "the two independence t statistics quoted in panel (c)"
+        }
+      ],
+      "aggregation": "none; every plotted value is an evidence row. Panel (a) draws the empirical histogram and its reflection about zero, so the asymmetry is visible without a fitted curve.",
+      "note": "Panel (b) shows why this dataset cannot separate g_2 from g_2^EIV: the two weights differ by 0.007 because the signal ratio beta_1^2 sigma_x^2 / m_2 is 0.079, not because the reliability is high. The observed band is wide because the design has 15 degrees of freedom."
+    },
+    "fig8_validation.pdf": {
+      "panels": {
+        "(a)": "evidence/realdata_nmf_svi/grid.csv: pred_bias vs obs_bias, all 462 cells, split at lam = 0.5",
+        "(b)": "evidence/realdata_nmf_svi/grid.csv: |z_e2| against dev and dev_ls, both axes clipped for display (z at 30, dev at 12)"
+      },
+      "note": "Clipping affects display only; every reported statistic is computed on unclipped values in scripts/realdata_nmf_svi.py."
+    }
+  }
+}

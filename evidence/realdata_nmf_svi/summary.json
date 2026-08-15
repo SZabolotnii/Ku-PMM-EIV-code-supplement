@@ -1,0 +1,88 @@
+{
+  "cells": 462,
+  "states": 11,
+  "passing": 25,
+  "failing": 129,
+  "pass_within2": 0.92,
+  "fail_within2": 0.43410852713178294,
+  "pass_median_dev": 0.31204985046886236,
+  "fail_median_dev": 2.5497812015522414,
+  "oos_pass_cells": 24,
+  "oos_pass_within2": 0.9166666666666666,
+  "tcls_within2_pass": 1.0,
+  "tcls_within2_fail": 1.0,
+  "bias_formula_corr": 0.9935049900161518,
+  "bias_formula_slope": 1.0120952318466943,
+  "bias_formula_all": {
+    "corr": 0.7804735418676219,
+    "slope": 1.4069047688854222
+  },
+  "bias_formula_lambda_ge_half": {
+    "corr": 0.9500013449741475,
+    "slope": 1.1202061926130984
+  },
+  "attenuation": {
+    "corr_ratio_lambda": 0.5754068200177579,
+    "slope": 0.9036620962563745,
+    "mean_gap": -0.004612091059813801,
+    "cells": 462
+  },
+  "varrat_pooled": {
+    "cells": 133,
+    "corr": 0.6841205019136193,
+    "slope": 1.341048014423026,
+    "mean_realised": 0.7432735054064986,
+    "mean_predicted": 0.5943755944598167
+  },
+  "demo": {
+    "criteria": {
+      "z_max": 2.0,
+      "lam_lo": 0.5,
+      "lam_hi": 0.9,
+      "g2eiv_max": 0.8
+    },
+    "cells": 36,
+    "within2": 31,
+    "attenuation_visible": 2,
+    "varrat_gap": 0.22867703871982542,
+    "tcls_within2": 36
+  },
+  "headline": {
+    "resp": "EP_MOBILE",
+    "group": "Black_NH",
+    "n": 1048,
+    "n_counties": 74,
+    "lam": 0.6767676175115288,
+    "nu2": 77621.46188735962,
+    "sx2": 162519.89180305586,
+    "varsigma": 0.030374448835491997,
+    "c3": 2.1268218125233234,
+    "c4": 8.426145865820914,
+    "g2": 0.5661511856405587,
+    "g2_eiv": 0.5766262477602826,
+    "t_opt": 0.022768982965889355,
+    "z_e2": -0.0009484443027043626,
+    "cov_x_eps2": -3.0209457028725355,
+    "gold": -0.0038467349707395093,
+    "naive": -0.0024814805248649847,
+    "tcls": -0.0036992257350081954,
+    "star": -0.003567075911965712,
+    "se_gold": 0.0004669276915978319,
+    "se_tcls": 0.0008505012525732224,
+    "se_star": 0.0006770284034746134,
+    "obs_bias": 0.00027965905877379727,
+    "pred_bias": 4.564200412789513e-07,
+    "dev": 0.41306842864870097,
+    "dev_ls": 0.17343799939743695,
+    "dev_naive": 1.6052350796002919,
+    "varrat": 0.6336710452422172,
+    "state": "Michigan",
+    "sample": "out-of-sample",
+    "boot": {
+      "B": 400,
+      "star_minus_gold_lo": -0.0006556387888984561,
+      "star_minus_gold_hi": 0.0013315634420906506,
+      "varrat_median": 0.6390034576883943
+    }
+  }
+}

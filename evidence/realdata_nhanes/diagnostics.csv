@@ -1,0 +1,37 @@
+check,value,se,stat,note
+reading 1 - reading 2,0.484732158436573,0.11059448757491283,4.382968528230057,t = 5.976 treating rows as independent; t = 4.383 with PSU clustering
+reading 2 - reading 3,0.056534636189146746,0.061253560768912606,0.9229608120649729,t = 0.749 treating rows as independent; t = 0.923 with PSU clustering
+reading 1 - reading 3,0.5412667946257198,0.1343751333267302,4.028027963400352,t = 6.439 treating rows as independent; t = 4.028 with PSU clustering
+"terminal digit share, even digits 0/2/4/6/8",1.0,nan,93.0126214156924,"shares 17.29/20.04/20.03/21.33/21.31 per cent; odd digits 0.00 per cent; chi-square against a uniform distribution over the five even digits, 4 df"
+nu_2 attributable to the 2 mmHg recording grid,0.3333333333333333,nan,1.8048003768643763,additive uniform rounding model; per cent of nu_2 in the stat column
+nu_4 attributable to the grid,37.1385265657424,nan,0.7340488326320284,per cent of nu_4 in the stat column
+nu_6 attributable to the grid,25352.591466862643,nan,0.37755664185846544,per cent of nu_6 in the stat column
+slope of grid-corrected moments on beta1(TC-PMM2*),0.014035058925877187,nan,-3.827020312511739e-05,"TC-PMM2* refitted with the grid contribution removed from nu_2, nu_4, nu_6; stat column is the change in the slope"
+pair variance (W2-W3)^2/2 on reading 1,-0.38871931770840207,0.08204417073375933,-4.7379273168575375,"mmHg^2 per mmHg; a non-zero slope means the measurement-error variance depends on the pressure level, contradicting U independent of X"
+"naive LS slope, design-weighted",0.013814438280038852,nan,0.00023648683872657013,WTMEC2YR weights; stat column is the difference from the unweighted estimate
+"corrected LS slope, design-weighted",0.016045418859999404,nan,0.0005145681928496199,WTMEC2YR weights; stat column is the difference from the unweighted estimate
+row-level bootstrap SE of the TC-LS slope,nan,0.0008328231170268767,0.825097251903115,"WRONG resampling unit, reported only for contrast; stat column is its ratio to the PSU cluster bootstrap SE"
+sign symmetry of the closed-form efficiency,0.7066162208822024,nan,0.0,"g2_EIV under (beta1, nu3, nu5) and under (-beta1, -nu3, -nu5); stat column is the absolute difference"
+signal ratio beta1^2 sigma_x^2 / m_2,0.07909826304450725,nan,nan,"the dimensionless quantity that controls how far g2_EIV can depart from g2; it is the regression signal-to-noise ratio, not the reliability"
+TC-LS minus TC-PMM2* slope (over-identification contrast),0.0014575215381474795,0.0003488783226342777,4.177736028831378,"both are consistent for beta_1 under the model, so this is a specification test; PSU cluster bootstrap, B = 2000"
+same contrast with the surrogate = mean of the three readings,0.0014770787340928366,nan,1.0134181179718376,averaging the replicates divides nu_2 by k = 3 and so scales down any conditional-moment failure of U; stat column is the ratio of the two contrasts. Reliability rises to 0.9542
+TC-PMM2* slope with the surrogate = mean of three readings,0.013785385211470049,nan,0.6967435103950903,stat column is g_2^EIV for that surrogate
+TC-PMM2* slope with the replicate-only-sample moments,0.014242478201297374,nan,0.8640270010542725,nu_2..nu_6 taken from all subjects with three usable readings rather than from the regression sample; stat column is the implied reliability
+nu_2 if zero diastolic readings were retained,31.86801679815069,nan,-1.5064471366692864,"n = 5861; stat column is the implied gamma_3(U). A recorded 0 means no fifth Korotkoff sound was audible, so retaining those subjects would manufacture almost the whole skewness signal"
+nu_2 among the subjects removed by the GGT merge,28.3621209791106,nan,-0.5142564245210588,"n = 1020, mostly ages 8-11 (the biochemistry file starts at 12); their measurement error is larger than the regression sample's, which is why nu is recovered from the regression sample itself"
+squared naive residual regressed on the surrogate,0.0034524087854602066,0.0010459718341993525,3.3006708905339504,"the degree-two score needs E[e^2|X] constant; a non-zero slope means the regression error is not independent of the covariate, which least squares tolerates and the quadratic moment condition does not"
+cubed naive residual regressed on the surrogate,0.0015445422297264897,0.0026843278572143475,0.5753925421499494,the same for E[e^3|X]
+"m_2 of the naive residual, quintile 1",0.32870115273541106,nan,49.84171642413584,"c_3 = 1.6101, c_4 = 4.4706, implied g_2 = 0.5993; stat column is the mean surrogate value in the quintile"
+"m_2 of the naive residual, quintile 2",0.37701425598171223,nan,60.843122918717214,"c_3 = 1.2706, c_4 = 4.7122, implied g_2 = 0.7595; stat column is the mean surrogate value in the quintile"
+"m_2 of the naive residual, quintile 3",0.3875719954710926,nan,67.55405769664951,"c_3 = 1.2704, c_4 = 4.2105, implied g_2 = 0.7401; stat column is the mean surrogate value in the quintile"
+"m_2 of the naive residual, quintile 4",0.42639494212194856,nan,73.54939550353231,"c_3 = 1.2428, c_4 = 2.5749, implied g_2 = 0.6624; stat column is the mean surrogate value in the quintile"
+"m_2 of the naive residual, quintile 5",0.44097213164241805,nan,83.8302791273661,"c_3 = 1.1679, c_4 = 2.1122, implied g_2 = 0.6683; stat column is the mean surrogate value in the quintile"
+nu_2 within reading-1 quintile 1,25.665970772442588,2.2309048284615347,50.183716075156575,half the mean squared difference of readings 2 and 3; stat column is the mean of reading 1
+nu_2 within reading-1 quintile 2,18.67286559594252,1.4418009247087042,61.185122569737956,half the mean squared difference of readings 2 and 3; stat column is the mean of reading 1
+nu_2 within reading-1 quintile 3,14.263440860215054,0.7867982612585163,67.89605734767025,half the mean squared difference of readings 2 and 3; stat column is the mean of reading 1
+nu_2 within reading-1 quintile 4,11.89640768588137,0.6983381974960275,73.89139515455305,half the mean squared difference of readings 2 and 3; stat column is the mean of reading 1
+nu_2 within reading-1 quintile 5,13.049334377447142,0.7647391698497585,84.17227877838684,half the mean squared difference of readings 2 and 3; stat column is the mean of reading 1
+nu_2 within age 12-29,21.383360522022837,1.245182146271414,62.2294725394236,half the mean squared difference of readings 2 and 3; stat column is the mean of reading 1
+nu_2 within age 30-44,12.616692426584235,0.6351972484832842,71.57959814528593,half the mean squared difference of readings 2 and 3; stat column is the mean of reading 1
+nu_2 within age 45-59,13.112436115843272,0.9663472945748509,74.15332197614991,half the mean squared difference of readings 2 and 3; stat column is the mean of reading 1
+nu_2 within age 60-80,15.769662921348315,1.1636667629449307,68.85252808988764,half the mean squared difference of readings 2 and 3; stat column is the mean of reading 1

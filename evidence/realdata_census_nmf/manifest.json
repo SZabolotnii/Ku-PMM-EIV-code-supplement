@@ -1,0 +1,13 @@
+{
+  "state": "039",
+  "source": "https://uscb-2020-product-releases.s3.us-west-2.amazonaws.com/decennial/redistricting/2020/nmf/2020-pl94-nmf-state-partitioned/US_Person_PL_PROD/",
+  "files": {
+    "oh_block_group.parquet": {
+      "sha256": "6fa4b969014d3302de4875b509dea8e388198b59775fa63a322cf24445808410",
+      "bytes": 40844174
+    }
+  },
+  "n_units": 15333,
+  "boot": 400,
+  "note": "US Government work, public domain (17 U.S.C. 105).  The 2023-06-15 NMF release is a fixed, dated artefact; the raw parquet is therefore not tracked in git -- the sha256 above pins it."
+}

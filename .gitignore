@@ -1,0 +1,23 @@
+# Third-party inputs: downloaded on demand, never redistributed.
+# See docs/DATA_POLICY.md.
+data/
+
+# Raw per-replication Monte Carlo draws (~230 MB): regenerable from the seed
+# hierarchy in each evidence/<run>/manifest.json.  Everything the manuscript
+# cites -- summary.csv, paired.csv, manifest.json, verification_report.txt -- IS
+# tracked.
+evidence/*/estimates_raw.csv.gz
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
+
+# macOS
+.DS_Store

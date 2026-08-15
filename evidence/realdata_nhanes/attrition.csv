@@ -1,0 +1,6 @@
+step,n,note
+BPX_H records,9813,"blood-pressure examination file, one row per subject"
+three non-missing diastolic readings,6974,BPXDI1..3 all recorded (k = 3)
+no zero diastolic reading,6751,a recorded 0 means no fifth Korotkoff sound was heard; it is not a measurement of diastolic pressure and is dropped
+"merged with BIOPRO_H on SEQN, GGT present",5731,"LBXSGTSI (serum GGT, U/L); BIOPRO_H covers ages 12+"
+survey design variables present,5731,"SDMVSTRA, SDMVPSU, WTMEC2YR from DEMO_H"

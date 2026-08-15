@@ -1,0 +1,30 @@
+NHANES 2013-2014 real-data application -- verification report
+======================================================================
+
+[PASS] R0 file checksums
+       BPX_H.xpt: match; BIOPRO_H.xpt: match; DEMO_H.xpt: match
+[PASS] R1 replicate system vs theory/replicate_identification.py
+       symbolic identity of E[d^p] for p = 2,3,4,5: p=2: ok, p=3: ok, p=4: ok, p=5: ok; p=6 is the extension needed for nu_6, coefficient 0.090535
+[PASS] R2 all six moments identified at k = 3
+       coefficients of nu_p in E[d^p]: 2: 0.6667, 3: 0.2222, 4: 0.2222, 5: 0.1235, 6: 0.0905 (every one non-zero, so nu_2..nu_6 are all identified; at k = 2 the coefficients of nu_3 and nu_5 are exactly zero)
+[PASS] R3 TC-PMM2* weight fallback never fired
+       star_fallback = 0, cumulant-deconvolution clip = 0
+[PASS] R4 Cauchy-Schwarz bound g2_EIV <= 1
+       g2_EIV = 0.706616
+[PASS] R5 sign symmetry (beta1, nu3, nu5) -> (-beta1, -nu3, -nu5)
+       |difference| = 0.00e+00 (optimal weight), 0.00e+00 (transplanted weight)
+[PASS] R6 bootstrap convergence
+       all 2000 resamples converged for all 5 estimators
+[FAIL] R7 corrected LS and TC-PMM2* agree on the slope
+       difference 0.001458 with cluster-bootstrap SE 0.000349, z = 4.18. Under the model of this paper both are consistent for beta_1, so a large z is a specification signal, not an efficiency result. It is reported, not suppressed.
+[FAIL] R8 measurement error independent of the covariate
+       the pair variance (W_2-W_3)^2/2 has slope -0.3887 (SE 0.0820, t = -4.74) on reading 1; nu_2 falls from 25.7 to 13.0 across reading-1 quintiles. Reading 1 is independent of the errors in readings 2 and 3, so this is not a mechanical artefact
+[FAIL] R9 regression error independent of the covariate
+       the squared naive residual has slope +0.00345 (t = 3.30) on the surrogate; the cubed residual t = 0.58. Least squares tolerates this; the quadratic moment condition of the degree-two score does not
+[PASS] R10 the transplanted weight never loses at this shape of U
+       closed-form efficiency of the transplanted weight over lambda in [0.50, 0.995] with the standardised shape of U and the regression-error moments held at their estimates: maximum 0.8964, attained at lambda = 0.500. With beta_1 nu_3 < 0 no break-even reliability exists, so this dataset lies in the benign part of the parameter space, not the adversarial part
+
+8/11 checks passed
+
+Resampling unit: PSU within stratum (30 PSUs in 15 strata, design df = 15). Row-level resampling is never used for an interval.
+The point estimates are unweighted: this is an illustration of the estimator, not a population estimate.

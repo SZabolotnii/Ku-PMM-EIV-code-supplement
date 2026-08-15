@@ -1,0 +1,50 @@
+=== NMF covariate x SVI response ===
+
+-- Gate N1: the rank crosswalk is real (shifted merge is the control) --
+  [PASS] Ohio           merged  2734/ 3158  corr=0.9618  shifted-control=0.3042
+  [PASS] Pennsylvania   merged  2421/ 3431  corr=0.9744  shifted-control=0.2219
+  [PASS] Michigan       merged  1596/ 2934  corr=0.9669  shifted-control=0.3252
+  [PASS] Indiana        merged  1592/ 1690  corr=0.9533  shifted-control=0.3343
+  [PASS] Illinois       merged  1932/ 3262  corr=0.9610  shifted-control=0.2885
+  [PASS] NorthCarolina  merged  2426/ 2655  corr=0.9434  shifted-control=0.2649
+  [PASS] Georgia        merged  2780/ 2780  corr=0.9223  shifted-control=0.2417
+  [PASS] Tennessee      merged  1410/ 1693  corr=0.9614  shifted-control=0.2482
+  [PASS] Missouri       merged  1653/ 1653  corr=0.9600  shifted-control=0.3189
+  [PASS] Wisconsin      merged  1290/ 1523  corr=0.9727  shifted-control=0.3720
+  [PASS] Minnesota      merged  1458/ 1496  corr=0.9563  shifted-control=0.3100
+
+-- Gate N2: does the screen predict success, out of sample? --
+  screen PASSES (|z|<2):  25 cells, 92% within 2 SE of gold, median dev 0.31
+  screen FAILS (|z|>=2): 129 cells, 43% within 2 SE of gold, median dev 2.55
+  out-of-sample only    :  24 passing cells, 92% within 2 SE
+
+-- Gate N3: the bias formula E[Psi1] = -b Cov(X,eps^2) --
+  on the White_NH grid (154 cells): corr = 0.9935, slope = 1.0121
+  all cells with lambda >= 0.5 (350): corr = 0.9500, slope = 1.1202
+  every cell (462): corr = 0.7805, slope = 1.4069  -- degrades where lambda ~ 0.1 and the first-order expansion fails
+
+-- Gate N7: is the attenuation the one lambda predicts? --
+  naive/gold vs lambda over 462 cells: corr = 0.5754, slope = 0.9037 (1.0 = exact), mean gap = -0.0046
+
+-- Gate N4: robustness asymmetry (TC-LS should not care) --
+  |gold-tcls|/se < 2 in 100% of passing and 100% of failing cells
+
+-- Gate N5: is the predicted variance reduction realised? (pooled) --
+  133 usable cells passing the screen: corr(g2_EIV, realised) = 0.6841, slope = 1.3410
+  mean realised 0.7433 vs mean predicted 0.5944  -- a real reduction, systematically smaller than the asymptotic value at
+     these n (865-1887) and kurtoses, consistent with the finite-sample
+     threshold already reported in the simulation section
+
+-- Gate N6: cells meeting the pre-specified demonstration criteria --
+  (screen passes, lambda in [0.5,0.9], predicted g2_EIV <= 0.8; no outcome enters the selection)
+  36 cells: 31 land within 2 SE of gold, 36 for TC-LS, 2 show a visibly attenuated naive slope
+  mean |varrat - g2_EIV| = 0.2287
+
+-- headline cell: Michigan / Black_NH / EP_MOBILE --
+  n=1048 counties=74 lambda=0.6768 varsigma=0.030
+  eps: c3=+2.127 c4=+8.426 -> g2=0.5662, g2_EIV=0.5766
+  screen z(Cov(X,eps^2)) = -0.001  (condition not rejected)
+  beta1: gold=-0.003847 naive=-0.002481 tc_ls=-0.003699 star=-0.003567
+  |gold-star|/se = 0.41   |gold-naive|/se = 1.61
+  Var(star)/Var(tc_ls) = 0.6337  vs predicted g2_EIV 0.5766
+  county bootstrap (B=400): star-gold 95% CI [-0.000656, +0.001332], median varrat 0.6390

@@ -1,0 +1,94 @@
+==============================================================================
+VERIFICATION REPORT  --  Ku-PMM-EIV, TC-PMM2 linear EIV
+run       : confirmatory   (<repo>/evidence/confirmatory)
+mode      : confirmatory   M = 2000
+cells     : 58   wall = 296.48s
+git       : 3113454afe9e   python = <repo>/.venv/bin/python
+numpy     : 2.5.2   scipy = 1.18.0
+==============================================================================
+
+[PASS] G0  reduction to the EstemPMM oracle at U == 0 (max|dbeta| < 1e-6)
+       ok  dataset 0 (g_c3_1.0, n=200)                          max|dbeta| = 2.220e-16
+       ok  dataset 1 (g_c3_1.5, n=500)                          max|dbeta| = 1.110e-16
+       ok  dataset 2 (g_c3_0.5, n=1000)                         max|dbeta| = 1.110e-16
+       ok  dataset 3 (gauss, n=300)                             max|dbeta| = 2.220e-16
+
+[PASS] G0b  pure-Python cross-check of the same reduction (independent solver)
+       ok  g_c3_1.0, n=300                                      max|dbeta| = 0.000e+00
+       ok  g_c3_1.5, n=800                                      max|dbeta| = 0.000e+00
+       ok  gauss, n=400                                         max|dbeta| = 0.000e+00
+
+[PASS] G1  unbiasedness vs naive-PMM2 (H1) [gamma U]
+
+[FAIL] G2  efficiency of TC-PMM2-oracle over TC-LS, c3 >= 1.0 (H2)
+       FAIL g_c3_1.0 lam=0.80 n=250                              dMSE=+5.61e-03 CI=[+4.98e-03,+6.25e-03] RE=1.692
+       FAIL g_c3_1.0 lam=0.80 n=500                              dMSE=+2.27e-03 CI=[+1.99e-03,+2.56e-03] RE=1.556
+       FAIL g_c3_1.0 lam=0.80 n=1000                             dMSE=+1.30e-03 CI=[+1.15e-03,+1.44e-03] RE=1.643
+       FAIL g_c3_1.0 lam=0.90 n=250                              dMSE=+9.96e-04 CI=[+7.01e-04,+1.29e-03] RE=1.182
+       FAIL g_c3_1.0 lam=0.90 n=500                              dMSE=+3.68e-04 CI=[+2.22e-04,+5.14e-04] RE=1.133
+       FAIL g_c3_1.0 lam=0.90 n=1000                             dMSE=+2.82e-04 CI=[+2.08e-04,+3.57e-04] RE=1.199
+       FAIL g_c3_1.0 lam=0.95 n=250                              dMSE=-2.04e-04 CI=[-4.21e-04,+1.28e-05] RE=0.957
+       FAIL g_c3_1.0 lam=0.95 n=1000                             dMSE=-3.86e-06 CI=[-5.93e-05,+5.16e-05] RE=0.997
+       FAIL g_c3_1.5 lam=0.80 n=250                              dMSE=+4.38e-03 CI=[+3.78e-03,+4.97e-03] RE=1.516
+       FAIL g_c3_1.5 lam=0.80 n=500                              dMSE=+1.87e-03 CI=[+1.58e-03,+2.16e-03] RE=1.448
+       FAIL g_c3_1.5 lam=0.80 n=1000                             dMSE=+1.01e-03 CI=[+8.66e-04,+1.16e-03] RE=1.478
+       FAIL g_c3_1.5 lam=0.90 n=250                              dMSE=+1.94e-04 CI=[-1.16e-04,+5.04e-04] RE=1.034
+       FAIL g_c3_1.5 lam=0.90 n=500                              dMSE=-1.88e-05 CI=[-1.77e-04,+1.40e-04] RE=0.994
+       FAIL g_c3_1.5 lam=0.90 n=1000                             dMSE=+7.01e-05 CI=[-1.21e-05,+1.52e-04] RE=1.049
+       FAIL RE in [g2-.07,g2+.07] g_c3_1.0 lam=.95 n=1000        RE=0.997 vs g2=0.714 -> [0.644,0.784]
+       FAIL RE in [g2-.07,g2+.07] g_c3_1.5 lam=.95 n=1000        RE=0.830 vs g2=0.581 -> [0.511,0.651]
+       (4/20 sub-checks passed)
+
+[FAIL] G3  adaptive loss bounded by 10% at n >= 500 (H3)
+       FAIL g_c3_1.0 lam=0.80 n=500 b1=+1                        MSE(adapt)/MSE(oracle) = 1.2888
+       FAIL g_c3_1.5 lam=0.80 n=500 b1=+1                        MSE(adapt)/MSE(oracle) = 1.2027
+       (12/14 sub-checks passed)
+
+[PASS] G4  sandwich 95% CI coverage in [93,97]% at n >= 500 (H4)
+
+[PASS] G5  Gaussian-eps control: MSE(TC-PMM2)/MSE(TC-LS) <= 1.05 (H0)
+       ok  gauss gamma_wh lam=0.80 n=250                        MSE ratio = 1.0000
+       ok  gauss gamma_wh lam=0.80 n=500                        MSE ratio = 1.0000
+       ok  gauss gamma_wh lam=0.80 n=1000                       MSE ratio = 1.0000
+       ok  gauss gamma_wh lam=0.90 n=250                        MSE ratio = 1.0000
+       ok  gauss gamma_wh lam=0.90 n=500                        MSE ratio = 1.0000
+       ok  gauss gamma_wh lam=0.90 n=1000                       MSE ratio = 1.0000
+       ok  gauss gamma_wh lam=0.95 n=250                        MSE ratio = 1.0000
+       ok  gauss gamma_wh lam=0.95 n=500                        MSE ratio = 1.0000
+       ok  gauss gamma_wh lam=0.95 n=1000                       MSE ratio = 1.0000
+
+[FAIL] G6  estimator defined + G1 holds under heavy-tailed lognormal U
+       FAIL g_c3_1.0 lam=0.80 n=250                              conv=81.0% |bias|=0.24920 thr=0.05406
+       FAIL g_c3_1.0 lam=0.80 n=500                              conv=91.0% |bias|=0.18756 thr=0.05548
+       FAIL g_c3_1.0 lam=0.80 n=1000                             conv=97.7% |bias|=0.13024 thr=0.05611
+       FAIL g_c3_1.0 lam=0.90 n=250                              conv=100.0% |bias|=0.03574 thr=0.02857
+       FAIL g_c3_1.5 lam=0.80 n=250                              conv=82.8% |bias|=0.24473 thr=0.05653
+       FAIL g_c3_1.5 lam=0.80 n=500                              conv=93.5% |bias|=0.18080 thr=0.05774
+       FAIL g_c3_1.5 lam=0.80 n=1000                             conv=98.6% |bias|=0.12603 thr=0.05827
+       FAIL g_c3_1.5 lam=0.90 n=250                              conv=100.0% |bias|=0.03310 thr=0.02964
+       (10/18 sub-checks passed)
+
+==============================================================================
+  G0   PASS     4/4 sub-checks
+  G0b  PASS     3/3 sub-checks
+  G1   PASS     80/80 sub-checks
+  G2   FAIL     4/20 sub-checks
+  G3   FAIL     12/14 sub-checks
+  G4   PASS     78/78 sub-checks
+  G5   PASS     9/9 sub-checks
+  G6   FAIL     10/18 sub-checks
+
+5/8 checks passed
+
+------------------------------------------------------------------------------
+KILL CRITERION K1 (SPEC 8): RE(TC-PMM2 : TC-LS) > 0.95 in ALL c3 = 1.0 cells?
+  lam=0.80 n=  250  RE=1.6916 boot95=[1.615,1.769]  >0.95
+  lam=0.80 n=  500  RE=1.5565 boot95=[1.486,1.630]  >0.95
+  lam=0.80 n= 1000  RE=1.6427 boot95=[1.568,1.716]  >0.95
+  lam=0.90 n=  250  RE=1.1820 boot95=[1.124,1.239]  >0.95
+  lam=0.90 n=  500  RE=1.1328 boot95=[1.081,1.187]  >0.95
+  lam=0.90 n= 1000  RE=1.1986 boot95=[1.145,1.257]  >0.95
+  lam=0.95 n=  250  RE=0.9567 boot95=[0.912,1.001]  >0.95
+  lam=0.95 n=  500  RE=0.9396 boot95=[0.893,0.987]  <=0.95  <-- K1 not satisfied here
+  lam=0.95 n= 1000  RE=0.9966 boot95=[0.949,1.048]  >0.95
+  => K1 does NOT fire (8/9 cells above 0.95)

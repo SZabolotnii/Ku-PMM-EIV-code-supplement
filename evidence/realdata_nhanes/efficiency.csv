@@ -1,0 +1,8 @@
+quantity,value,ci_lo,ci_hi,note
+g_2 (error-free Kunchenko coefficient),0.6956142816769447,0.6757082681358624,0.7161913465472824,1 - c_3^2/(2+c_4) with the regression-error moments recovered by cumulant deconvolution
+g_2^EIV (closed-form EIV analogue),0.7066162208822024,0.6849659741003739,0.7296209375993906,"1 - Corr^2(Phi_L, G) at the recovered moments"
+ARE of the transplanted weight,0.7067167294456478,nan,nan,closed-form efficiency at t = m_3/(m_4 - m_2^2)
+observed variance ratio TC-PMM2* : TC-LS (cluster bootstrap),0.5464529831781658,0.2554939818639834,0.8374119844923482,"ratio of bootstrap variances over the same PSU resamples; the interval is a delete-one-stratum jackknife (15 replicates, SE 0.1485). Monte Carlo interval of the bootstrap variances alone: [0.5362, 0.5588]"
+observed variance ratio TC-PMM2 : TC-LS (cluster bootstrap),0.5348890085667588,0.24390771933299377,0.8258702978005239,"transplanted weight; delete-one-stratum jackknife interval. Monte Carlo interval: [0.5246, 0.5473]"
+observed variance ratio TC-PMM2* : TC-PMM2 (re-optimisation),1.0216193909880347,nan,nan,"what re-optimising the weight buys on this dataset. The transplanted ratio is t = 0.3765 and the optimum is 0.3697, so the answer is nothing: the negative half of the paper is inactive in this regime"
+observed variance ratio TC-PMM2* : TC-LS (sandwich),0.6726720755843044,nan,nan,"squared ratio of model-based sandwich standard errors, which ignore the survey design"
