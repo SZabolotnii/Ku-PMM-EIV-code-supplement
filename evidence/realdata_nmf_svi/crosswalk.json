@@ -3,77 +3,77 @@
     "state": "Ohio",
     "merged": 2734,
     "of": 3158,
-    "corr": 0.9618028902219825,
-    "corr_shifted": 0.304178848089824
+    "corr": 0.9618028902219818,
+    "corr_shifted": 0.3041788480898241
   },
   {
     "state": "Pennsylvania",
     "merged": 2421,
     "of": 3431,
     "corr": 0.9744303359976538,
-    "corr_shifted": 0.2218884566472527
+    "corr_shifted": 0.22188845664725268
   },
   {
     "state": "Michigan",
     "merged": 1596,
     "of": 2934,
-    "corr": 0.9668902541340959,
-    "corr_shifted": 0.3251695436952864
+    "corr": 0.9668902541340961,
+    "corr_shifted": 0.3251695436952866
   },
   {
     "state": "Indiana",
     "merged": 1592,
     "of": 1690,
-    "corr": 0.9532985518806535,
-    "corr_shifted": 0.33432669722736374
+    "corr": 0.9532985518806533,
+    "corr_shifted": 0.33432669722736347
   },
   {
     "state": "Illinois",
     "merged": 1932,
     "of": 3262,
-    "corr": 0.9609875393035039,
-    "corr_shifted": 0.28847940359537677
+    "corr": 0.9609875393035043,
+    "corr_shifted": 0.2884794035953767
   },
   {
     "state": "NorthCarolina",
     "merged": 2426,
     "of": 2655,
-    "corr": 0.9434227716083146,
-    "corr_shifted": 0.2648724803627382
+    "corr": 0.9434227716083143,
+    "corr_shifted": 0.2648724803627381
   },
   {
     "state": "Georgia",
     "merged": 2780,
     "of": 2780,
-    "corr": 0.9222840120026139,
-    "corr_shifted": 0.24165745707067207
+    "corr": 0.9222840120026136,
+    "corr_shifted": 0.24165745707067218
   },
   {
     "state": "Tennessee",
     "merged": 1410,
     "of": 1693,
-    "corr": 0.9614154651665722,
-    "corr_shifted": 0.24815570281908209
+    "corr": 0.9614154651665723,
+    "corr_shifted": 0.24815570281908222
   },
   {
     "state": "Missouri",
     "merged": 1653,
     "of": 1653,
-    "corr": 0.9599863331745727,
-    "corr_shifted": 0.3188977208315324
+    "corr": 0.9599863331745729,
+    "corr_shifted": 0.31889772083153234
   },
   {
     "state": "Wisconsin",
     "merged": 1290,
     "of": 1523,
-    "corr": 0.9727315925327391,
-    "corr_shifted": 0.3719506377239686
+    "corr": 0.9727315925327396,
+    "corr_shifted": 0.3719506377239685
   },
   {
     "state": "Minnesota",
     "merged": 1458,
     "of": 1496,
-    "corr": 0.9562941325103297,
-    "corr_shifted": 0.3100048339635608
+    "corr": 0.9562941325103302,
+    "corr_shifted": 0.31000483396356077
   }
 ]

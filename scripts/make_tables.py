@@ -36,7 +36,7 @@ OUTDIR = ROOT / 'output' / 'tables'
 PROVPATH = ROOT / 'output' / 'figures' / 'figure_data_provenance.json'
 
 STR_FIELDS = {'cell_id', 'eps_key', 'u_family', 'estimator', 'param',
-              'estimator_a', 'estimator_b',
+              'estimator_a', 'estimator_b', 'x_family',
               # real-data application evidence (scripts/realdata_nhanes.py)
               'quantity', 'check', 'block', 'key', 'note', 'sample',
               'adjustment', 'step', 'resampling_unit', 'variant'}
@@ -89,6 +89,12 @@ EV = {
     'conf_paired': load_csv(EVIDENCE / 'confirmatory' / 'paired.csv'),
     'ls_paired': load_csv(EVIDENCE / 'lambda_star' / 'paired.csv'),
 }
+_ROB = EVIDENCE / 'robustness'
+if (_ROB / 'paired.csv').exists():          # robustness branch (2026-08-15)
+    EV['rob_summary'] = load_csv(_ROB / 'summary.csv')
+    EV['rob_paired'] = load_csv(_ROB / 'paired.csv')
+X_TEX = {'gauss': r'$N(1,1)$', 'x_gamma': r'gamma, $\gamma_1{=}1$',
+         'x_t5': r'$t_5$'}
 LAMBDA_STAR_THEORY = EVIDENCE / 'asymptotics' / 'lambda_star_theory.csv'
 VERIF = EVIDENCE / 'confirmatory' / 'verification_report.txt'
 
@@ -437,8 +443,8 @@ def tab_bias():
         r'\multicolumn{4}{c}{tessarine-debiased} \\',
         r'\cmidrule(lr){5-6}\cmidrule(lr){7-10}',
         r'$c_3(\varepsilon)$ & $U$ & $\lambda$ & $-(1-\lambda)$ & '
-        r'LS & PMM2 & TC-LS & TC-PMM2 & TC-PMM2$^{*}$ & TC-PMM2$^{*}$ \\',
-        r' & & & & & & & fixed $t$ & oracle & adaptive \\',
+        r'LS & PMM2 & TC-LS & TC-PMM2 fixed $t$ & TC-PMM2$^{*}$ oracle & '
+        r'TC-PMM2$^{*}$ adaptive \\',
     ]
     write('tab_bias.tex',
           'bias of the slope estimate, beta1 = +1, n = 1000, M = 2000',
@@ -795,6 +801,85 @@ def tab_validation():
     print('  wrote tab_validation.tex')
 
 
+# ==========================================================================
+# tab_robustness -- non-Gaussian latent covariate + SIMEX baseline (2026-08-15)
+# ==========================================================================
+def tab_robustness():
+    if 'rob_paired' not in EV:
+        print('  (no evidence/robustness -- tab_robustness skipped)')
+        return
+    body = []
+    n_rows = 0
+    for xf in ('gauss', 'x_gamma', 'x_t5'):
+        if body:
+            body.append(r'\addlinespace')
+        for u in ('gamma_wh', 'gamma_fixed'):
+            for lam in (0.80, 0.95):
+                kw = dict(x_family=xf, u_family=u, lam=lam, n=1000.0, b1_true=1.0,
+                          param='b1', estimator_b='tc_ls')
+                fx = sel(EV['rob_paired'], estimator_a='tc_pmm2_oracle', **kw)
+                so = sel(EV['rob_paired'], estimator_a='tc_pmm2star_oracle', **kw)
+                sa = sel(EV['rob_paired'], estimator_a='tc_pmm2star_adaptive', **kw)
+                sx = sel(EV['rob_paired'], estimator_a='simex_ls', **kw)
+                cv = sel(EV['rob_summary'], x_family=xf, u_family=u, lam=lam,
+                         n=1000.0, b1_true=1.0, param='b1',
+                         estimator='tc_pmm2star_adaptive')
+                if not (fx and so and sa and sx and cv):
+                    continue
+                fx, so, sa, sx, cv = fx[0], so[0], sa[0], sx[0], cv[0]
+                re_fix = fmt(fx['re'])
+                if fx['re'] > 1.0:
+                    re_fix = bold(re_fix)
+                re_sx = fmt(sx['re'])
+                if sx['re'] > 1.0:
+                    re_sx = bold(re_sx)
+                body.append(' & '.join([
+                    X_TEX[xf], U_TEX[u], f'{lam:.2f}',
+                    re_fix, f"({fmt(fx['se_re'])})",
+                    fmt(so['re']), f"({fmt(so['se_re'])})", fmt(so['are_star_theory']),
+                    fmt(sa['re']),
+                    re_sx, f"({fmt(sx['se_re'])})",
+                    f"{100 * cv['coverage']:.1f}",
+                ]) + r' \\')
+                n_rows += 1
+    header = [
+        r' & & & \multicolumn{2}{c}{TC-PMM2, fixed $t$} & '
+        r'\multicolumn{3}{c}{TC-PMM2$^{*}$ oracle} & adaptive & '
+        r'\multicolumn{2}{c}{SIMEX} & \\',
+        r'\cmidrule(lr){4-5}\cmidrule(lr){6-8}\cmidrule(lr){9-9}\cmidrule(lr){10-11}',
+        r'$X$ & $U$ & $\lambda$ & '
+        r'\multicolumn{2}{c}{$\widehat{\mathrm{RE}}$ (SE)} & '
+        r'\multicolumn{2}{c}{$\widehat{\mathrm{RE}}^{*}$ (SE)} & ARE$^{*}$ & '
+        r'$\widehat{\mathrm{RE}}^{*}$ & '
+        r'\multicolumn{2}{c}{$\widehat{\mathrm{RE}}$ (SE)} & cov.\,\% \\',
+    ]
+    write('tab_robustness.tex',
+          'robustness branch: latent-covariate law and SIMEX baseline, c3 = 1.0, '
+          'beta1 = +1, n = 1000, M = 2000',
+          'l l r r@{\\,} l r@{\\,} l r r r@{\\,} l r', header, body,
+          tabcolsep='4pt')
+    PROV['tab_robustness.tex'] = {
+        'what': 'Measured relative efficiency against TC-LS for the fixed-weight, '
+                'oracle and adaptive TC-PMM2 estimators and for a quadratic SIMEX '
+                'baseline, with the closed-form ARE*, under three latent-covariate '
+                'laws with the same mean and variance; last column is the empirical '
+                '95% sandwich coverage of the adaptive TC-PMM2*.',
+        'sources': [
+            {'file': 'evidence/robustness/paired.csv',
+             'filter': "param='b1'; n=1000; b1_true=1; estimator_b='tc_ls'; "
+                       'estimator_a in {tc_pmm2_oracle, tc_pmm2star_oracle, '
+                       'tc_pmm2star_adaptive, simex_ls}',
+             'columns': ['re', 'se_re', 'are_star_theory']},
+            {'file': 'evidence/robustness/summary.csv',
+             'filter': "param='b1'; estimator='tc_pmm2star_adaptive'",
+             'columns': ['coverage']},
+        ],
+        'rows': n_rows,
+        'aggregation': 'none; values are rounded to four decimals (coverage to one '
+                       'decimal in per cent).',
+    }
+
+
 def write_provenance():
     doc = {}
     if PROVPATH.exists():
@@ -817,6 +902,7 @@ def main():
     tab_lognormal()
     tab_application()
     tab_validation()
+    tab_robustness()
     write_provenance()
     print('done.')
 

@@ -71,6 +71,7 @@ python scripts/run_study.py --mode lambda_star      # 108 cells,        ~22 min
 python scripts/run_study.py --mode sensitivity      #  28 cells,        ~2 min
 python scripts/run_study.py --mode asymptotics      # closed forms only, seconds
 python scripts/run_study.py --mode negative_nu3     # 156 cells,        ~5 min
+python scripts/run_study.py --mode robustness       #  12 cells (non-Gaussian X + SIMEX), ~7 min
 ```
 
 Wall times are from the reported runs (9 workers). Each mode overwrites

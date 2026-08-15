@@ -260,6 +260,87 @@ check('pre-specified demonstration set: TC-PMM2* within 2 SE', 'Sec 9.10',
 check('pre-specified demonstration set: TC-LS within 2 SE', 'Sec 9.10',
       svi['demo']['tcls_within2'], 36, 0)
 
+# the same screen computed from the observables only (Lemma "testable"), 2026-08-15
+so = svi['screen_obs']
+check('observable-only screen: passing cells', 'Sec 9.10', so['passing'], 24, 0)
+check('observable-only screen: failing cells', 'Sec 9.10', so['failing'], 130, 0)
+check('observable-only screen passes -> within 2 SE', 'Sec 9.10',
+      100 * so['pass_within2'], 96, 0)
+check('observable-only screen fails  -> within 2 SE', 'Sec 9.10',
+      100 * so['fail_within2'], 43, 0)
+check('observable-only screen: median dev, passing', 'Sec 9.10',
+      so['pass_median_dev'], 0.30, 2)
+check('observable-only screen: median dev, failing', 'Sec 9.10',
+      so['fail_median_dev'], 2.49, 2)
+check('observable-only screen: out-of-sample passing cells', 'Sec 9.10',
+      so['oos_pass_cells'], 23, 0)
+check('observable-only screen: out-of-sample within 2 SE', 'Sec 9.10',
+      100 * so['oos_pass_within2'], 96, 0)
+check('observable-only screen: TC-LS within 2 SE (pass)', 'Sec 9.10',
+      100 * so['tcls_within2_pass'], 100, 0)
+check('observable-only screen: TC-LS within 2 SE (fail)', 'Sec 9.10',
+      100 * so['tcls_within2_fail'], 100, 0)
+check('verdict agreement of the two screens, 154 cells (%)', 'Sec 9.10',
+      100 * so['verdict_agreement'], 99.4, 1)
+check('verdict agreement of the two screens, all 462 cells (%)', 'Sec 9.10',
+      100 * so['verdict_agreement_all_cells'], 85.7, 1)
+check('correlation of the two screen statistics', 'Sec 9.10', so['z_corr'], 0.997, 3)
+check('headline cell observable-only screen z', 'Sec 9.10', h['z_e2_obs'], -0.232, 3)
+
+# -- Section 8.9: robustness branch (latent-covariate law, SIMEX baseline) --------
+print('\nSection 8.9  robustness branch')
+ROB_P = rows(EV / 'robustness' / 'paired.csv')
+ROB_S = rows(EV / 'robustness' / 'summary.csv')
+star = [r for r in ROB_P if r['param'] == 'b1' and r['estimator_a'] == 'tc_pmm2star_oracle'
+        and r['estimator_b'] == 'tc_ls']
+check('robustness: cells with TC-PMM2* vs TC-LS', 'Sec 8.9', len(star), 12, 0)
+spread = max(max(r['re'] for r in star if (r['u_family'], r['lam']) == key)
+             - min(r['re'] for r in star if (r['u_family'], r['lam']) == key)
+             for key in {(r['u_family'], r['lam']) for r in star})
+check('robustness: max spread of RE* across X laws within a cell', 'Sec 8.9',
+      spread, 0.0114, 4)
+check('robustness: max |RE* - ARE*|', 'Sec 8.9',
+      max(abs(r['re'] - r['are_star_theory']) for r in star), 0.0182, 4)
+check('robustness: max |z| of RE* against ARE*', 'Sec 8.9',
+      max(abs(r['re'] - r['are_star_theory']) / r['se_re'] for r in star), 2.18, 2)
+ao = [r for r in ROB_P if r['param'] == 'b1' and r['estimator_a'] == 'tc_pmm2star_adaptive'
+      and r['estimator_b'] == 'tc_pmm2star_oracle']
+check('robustness: adaptive/oracle MSE ratio, min', 'Sec 8.9', min(r['re'] for r in ao), 0.9918, 4)
+check('robustness: adaptive/oracle MSE ratio, max', 'Sec 8.9', max(r['re'] for r in ao), 1.0075, 4)
+sx = [r for r in ROB_P if r['param'] == 'b1' and r['estimator_a'] == 'simex_ls'
+      and r['estimator_b'] == 'tc_ls']
+check('robustness: SIMEX RE vs TC-LS at lam=0.80, min', 'Sec 8.9',
+      min(r['re'] for r in sx if r['lam'] == 0.8), 1.311, 3)
+check('robustness: SIMEX RE vs TC-LS at lam=0.80, max', 'Sec 8.9',
+      max(r['re'] for r in sx if r['lam'] == 0.8), 1.430, 3)
+check('robustness: SIMEX RE vs TC-LS at lam=0.95, min', 'Sec 8.9',
+      min(r['re'] for r in sx if r['lam'] == 0.95), 1.0022, 4)
+check('robustness: SIMEX RE vs TC-LS at lam=0.95, max', 'Sec 8.9',
+      max(r['re'] for r in sx if r['lam'] == 0.95), 1.0096, 4)
+vs = [r for r in ROB_P if r['param'] == 'b1' and r['estimator_a'] == 'tc_pmm2star_oracle'
+      and r['estimator_b'] == 'simex_ls']
+check('robustness: TC-PMM2*/SIMEX MSE at lam=0.80, min', 'Sec 8.9',
+      min(r['re'] for r in vs if r['lam'] == 0.8), 0.680, 3)
+check('robustness: TC-PMM2*/SIMEX MSE at lam=0.80, max', 'Sec 8.9',
+      max(r['re'] for r in vs if r['lam'] == 0.8), 0.746, 3)
+check('robustness: TC-PMM2*/SIMEX MSE at lam=0.95, min', 'Sec 8.9',
+      min(r['re'] for r in vs if r['lam'] == 0.95), 0.768, 3)
+check('robustness: TC-PMM2*/SIMEX MSE at lam=0.95, max', 'Sec 8.9',
+      max(r['re'] for r in vs if r['lam'] == 0.95), 0.916, 3)
+sxb = [r for r in ROB_S if r['param'] == 'b1' and r['estimator'] == 'simex_ls' and r['lam'] == 0.8]
+check('robustness: SIMEX bias at lam=0.80 (about -0.03), max |bias|', 'Sec 8.9',
+      max(abs(r['bias']) for r in sxb), 0.03, 2)
+corr = [r for r in ROB_S if r['param'] == 'b1' and r['estimator'] in
+        ('tc_ls', 'tc_pmm2_oracle', 'tc_pmm2star_oracle', 'tc_pmm2star_adaptive')]
+check('robustness: max |bias| of corrected estimators (< 0.004)', 'Sec 8.9',
+      max(abs(r['bias']) for r in corr), 0.0037, 4)
+check('robustness: max MC SE of those biases', 'Sec 8.9',
+      max(r['se_bias'] for r in corr), 0.0013, 4)
+cov = [r for r in ROB_S if r['param'] == 'b1' and r['estimator'] in
+       ('tc_ls', 'tc_pmm2star_oracle', 'tc_pmm2star_adaptive')]
+check('robustness: sandwich coverage, min (%)', 'Sec 8.9', 100 * min(r['coverage'] for r in cov), 94.2, 1)
+check('robustness: sandwich coverage, max (%)', 'Sec 8.9', 100 * max(r['coverage'] for r in cov), 95.6, 1)
+
 # =========================================================================
 print('\n' + '=' * 72)
 if FAILURES:

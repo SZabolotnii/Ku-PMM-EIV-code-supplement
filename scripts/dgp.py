@@ -19,6 +19,18 @@ import numpy as np
 
 VAR_X = 1.0          # X ~ N(MEAN_X, VAR_X); reliability lam = VAR_X/(VAR_X+nu2)
 MEAN_X = 1.0
+# ROBUSTNESS BRANCH (2026-08-15).  The theory places no shape assumption on the
+# latent covariate (only mu_x, sigma_x^2 enter the limit; E|X|^3 < inf is a
+# domination requirement), but every cell above uses X ~ N(1, 1).  The
+# 'robustness' run adds two non-Gaussian latent covariates with the SAME mean
+# and variance, so that the closed forms are unchanged and only the finite-
+# sample behaviour can differ:
+#   'x_gamma' -- centred gamma, shape 4  (skewness 1.0, excess kurtosis 1.5)
+#   'x_t5'    -- Student t(5) scaled to unit variance (symmetric, excess
+#                kurtosis 6; E|X|^3 and E X^4 finite, E X^5 not)
+X_FAMILIES = ('gauss', 'x_gamma', 'x_t5')
+X_GAMMA_SHAPE = 4.0
+X_T_DF = 5.0
 LOGNORMAL_SIGMA = 1.0   # shape of the heavy-tail U cell (documented choice)
 GAMMA_FIXED_SHAPE = 4.0  # fixed-shape U design: skew 1.0, excess kurtosis 1.5,
                          # INDEPENDENT of lam (decouples U's shape from reliability)
@@ -239,6 +251,7 @@ class Cell:
     b0: float = 1.0
     b1: float = 1.0
     delta: float = 0.0      # U-moment misspecification amplitude (sensitivity)
+    x_family: str = 'gauss'  # latent-covariate law (robustness branch, 2026-08-15)
 
     @property
     def eps(self) -> EpsSpec:
@@ -255,11 +268,27 @@ class Cell:
         return d
 
 
-def make_cell(eps_key, u_family, lam, n, b0=1.0, b1=1.0, delta=0.0) -> Cell:
+def make_cell(eps_key, u_family, lam, n, b0=1.0, b1=1.0, delta=0.0,
+              x_family='gauss') -> Cell:
     cid = f'{eps_key}|{u_family}|lam{lam:g}|n{n}|b1{b1:g}'
     if delta > 0:
         cid += f'|d{delta:g}'
-    return Cell(cid, eps_key, u_family, lam, n, b0, b1, delta)
+    if x_family != 'gauss':
+        cid += f'|{x_family}'
+    return Cell(cid, eps_key, u_family, lam, n, b0, b1, delta, x_family)
+
+
+def draw_x(family: str, n: int, rng: np.random.Generator) -> np.ndarray:
+    """Latent covariate with mean MEAN_X and variance VAR_X in every family."""
+    if family == 'gauss':
+        return MEAN_X + np.sqrt(VAR_X) * rng.standard_normal(n)
+    if family == 'x_gamma':
+        k = X_GAMMA_SHAPE
+        return MEAN_X + np.sqrt(VAR_X) * (rng.gamma(k, 1.0, n) - k) / np.sqrt(k)
+    if family == 'x_t5':
+        df = X_T_DF
+        return MEAN_X + np.sqrt(VAR_X) * rng.standard_t(df, n) * np.sqrt((df - 2.0) / df)
+    raise ValueError(family)
 
 
 # --------------------------------------------------------------------------
@@ -276,12 +305,14 @@ def draw_replication(cell: Cell, rep: int) -> dict:
     """One replication.  X and eps depend only on (eps_key, n, rep) so that
     cells sharing those share the same latent data (variance-reduced grids);
     U depends additionally on (u_family, lam)."""
-    rng_core = np.random.default_rng(
-        np.random.SeedSequence([BASE_ENTROPY, _key('core'), _key(cell.eps_key), cell.n, rep]))
+    core_key = [BASE_ENTROPY, _key('core'), _key(cell.eps_key), cell.n, rep]
+    if cell.x_family != 'gauss':          # Gaussian cells keep their historical seeds
+        core_key.insert(2, _key(cell.x_family))
+    rng_core = np.random.default_rng(np.random.SeedSequence(core_key))
     rng_u = np.random.default_rng(
         np.random.SeedSequence([BASE_ENTROPY, _key('u'), _key(cell.u_family),
                                 int(round(cell.lam * 1000)), cell.n, rep]))
-    x = MEAN_X + np.sqrt(VAR_X) * rng_core.standard_normal(cell.n)
+    x = draw_x(cell.x_family, cell.n, rng_core)
     eps = cell.eps.draw(cell.n, rng_core)
     u = cell.u.draw(cell.n, rng_u)
     y = cell.b0 + cell.b1 * x + eps

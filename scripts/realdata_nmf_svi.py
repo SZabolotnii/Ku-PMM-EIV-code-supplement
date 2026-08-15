@@ -39,7 +39,10 @@ Gates
   N1  the tract crosswalk is real, not an artefact (a deliberately shifted merge must
       destroy the population correlation)
   N2  the screen |z(Cov(X,eps^2))| < 2 predicts, out of sample, whether the degree-two
-      estimator lands on the gold standard
+      estimator lands on the gold standard.  The screen is computed on the near-exact
+      reference covariate; N2b (2026-08-15) repeats it with the OBSERVABLE-only statistic
+      of Lemma "testable", z_obs = sqrt(n) corr(W, delta_TCLS^2) (nu3 = 0 here), which is
+      what an analyst without a gold standard can compute
   N3  the bias formula E[Psi1] = -b Cov(X, eps^2) reproduces the observed bias
   N4  TC-LS is unaffected by the screen (the robustness asymmetry)
   N5  the predicted variance reduction g2_EIV is realised, assessed pooled
@@ -217,6 +220,12 @@ def analyse_cell(sub, resp, group, nu2, v_hxc, boot=0, seed=20260815):
 
     cov = float(np.cov(r, resid ** 2, ddof=1)[0, 1])
     z_e2 = float(np.corrcoef(r, resid ** 2)[0, 1] * np.sqrt(n))
+    # observable-only version (Lemma "testable"): Cov(Wt, delta^2) - b1^2 nu3, with delta
+    # the TC-LS residual and nu3 = 0 for the discrete-Gaussian DP noise; identifies
+    # Cov(X, eps^2) without the reference covariate.
+    rl_obs = y - tcls.beta[0] - tcls.beta[1] * w
+    cov_obs = float(np.cov(w, rl_obs ** 2, ddof=1)[0, 1])
+    z_e2_obs = float(np.corrcoef(w, rl_obs ** 2)[0, 1] * np.sqrt(n))
 
     # cluster-robust standard errors for the three estimators
     des = np.column_stack([np.ones(n), r])
@@ -237,6 +246,7 @@ def analyse_cell(sub, resp, group, nu2, v_hxc, boot=0, seed=20260815):
                varsigma=float(gold.beta[1] ** 2 * sx2 / m2),
                c3=float(c3), c4=float(c4), g2=float(1 - c3 ** 2 / (2 + c4)),
                g2_eiv=float(g2_eiv), t_opt=float(t_opt), z_e2=z_e2, cov_x_eps2=cov,
+               z_e2_obs=z_e2_obs, cov_obs=cov_obs,
                gold=float(gold.beta[1]), naive=float(naive.beta[1]),
                tcls=float(tcls.beta[1]), star=float(star.beta[1]),
                se_gold=float(se_gold[1]), se_tcls=float(se_tcls[1]),
@@ -312,6 +322,13 @@ def main():
     failing = scr[scr.z_e2.abs() >= 2]
     oos = scr[scr['sample'] == 'out-of-sample']
     oos_pass = oos[oos.z_e2.abs() < 2]
+    # N2b: the same split with the observable-only screen statistic
+    passing_o = scr[scr.z_e2_obs.abs() < 2]
+    failing_o = scr[scr.z_e2_obs.abs() >= 2]
+    oos_pass_o = oos[oos.z_e2_obs.abs() < 2]
+    agree = float(((scr.z_e2.abs() < 2) == (scr.z_e2_obs.abs() < 2)).mean())
+    z_corr = float(np.corrcoef(scr.z_e2, scr.z_e2_obs)[0, 1])
+    agree_all = float(((df.z_e2.abs() < 2) == (df.z_e2_obs.abs() < 2)).mean())
     demo = df[(df.z_e2.abs() < DEMO['z_max'])
               & df.lam.between(DEMO['lam_lo'], DEMO['lam_hi'])
               & (df.g2_eiv <= DEMO['g2eiv_max'])]
@@ -359,6 +376,18 @@ def main():
         oos_pass_within2=float((oos_pass.dev < 2).mean()) if len(oos_pass) else None,
         tcls_within2_pass=float((passing.dev_ls < 2).mean()),
         tcls_within2_fail=float((failing.dev_ls < 2).mean()),
+        screen_obs=dict(passing=int(len(passing_o)), failing=int(len(failing_o)),
+                        pass_within2=float((passing_o.dev < 2).mean()),
+                        fail_within2=float((failing_o.dev < 2).mean()),
+                        pass_median_dev=float(passing_o.dev.median()),
+                        fail_median_dev=float(failing_o.dev.median()),
+                        oos_pass_cells=int(len(oos_pass_o)),
+                        oos_pass_within2=(float((oos_pass_o.dev < 2).mean())
+                                          if len(oos_pass_o) else None),
+                        tcls_within2_pass=float((passing_o.dev_ls < 2).mean()),
+                        tcls_within2_fail=float((failing_o.dev_ls < 2).mean()),
+                        verdict_agreement=agree, verdict_agreement_all_cells=agree_all,
+                        z_corr=z_corr),
         bias_formula_corr=corr, bias_formula_slope=slope,
         bias_formula_all=dict(corr=corr_all, slope=slope_all),
         bias_formula_lambda_ge_half=dict(corr=corr_hi, slope=slope_hi),
@@ -398,6 +427,20 @@ def main():
           f"{failing.dev.median():.2f}",
           f"  out-of-sample only    : {len(oos_pass):3d} passing cells, "
           f"{100*(oos_pass.dev<2).mean():.0f}% within 2 SE",
+          '', '-- Gate N2b: the same screen from the OBSERVABLES only (Lemma testable) --',
+          f"  z_obs = sqrt(n) corr(W, delta_TCLS^2); verdict agrees with the reference-covariate"
+          f" screen in {100*agree:.1f}% of the {len(scr)} cells (corr of the two z = {z_corr:.4f});"
+          f" over all {len(df)} cells {100*agree_all:.1f}%",
+          f"  screen PASSES (|z_obs|<2): {len(passing_o):3d} cells, "
+          f"{100*(passing_o.dev<2).mean():.0f}% within 2 SE of gold, median dev "
+          f"{passing_o.dev.median():.2f}",
+          f"  screen FAILS (|z_obs|>=2): {len(failing_o):3d} cells, "
+          f"{100*(failing_o.dev<2).mean():.0f}% within 2 SE of gold, median dev "
+          f"{failing_o.dev.median():.2f}",
+          f"  out-of-sample only       : {len(oos_pass_o):3d} passing cells, "
+          f"{100*(oos_pass_o.dev<2).mean():.0f}% within 2 SE",
+          f"  TC-LS within 2 SE in {100*(passing_o.dev_ls<2).mean():.0f}% of passing and "
+          f"{100*(failing_o.dev_ls<2).mean():.0f}% of failing cells",
           '', '-- Gate N3: the bias formula E[Psi1] = -b Cov(X,eps^2) --',
           f"  on the {SCREEN_GROUP} grid ({len(scr)} cells): corr = {corr:.4f}, "
           f"slope = {slope:.4f}",
@@ -431,7 +474,8 @@ def main():
           f"varsigma={h['varsigma']:.3f}",
           f"  eps: c3={h['c3']:+.3f} c4={h['c4']:+.3f} -> g2={h['g2']:.4f}, "
           f"g2_EIV={h['g2_eiv']:.4f}",
-          f"  screen z(Cov(X,eps^2)) = {h['z_e2']:+.3f}  (condition not rejected)",
+          f"  screen z(Cov(X,eps^2)) = {h['z_e2']:+.3f}  (condition not rejected); "
+          f"observable-only z_obs = {h['z_e2_obs']:+.3f}",
           f"  beta1: gold={h['gold']:+.6f} naive={h['naive']:+.6f} "
           f"tc_ls={h['tcls']:+.6f} star={h['star']:+.6f}",
           f"  |gold-star|/se = {h['dev']:.2f}   |gold-naive|/se = {h['dev_naive']:.2f}",

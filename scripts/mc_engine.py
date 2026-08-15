@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from dgp import Cell, draw_replication, assumed_u_moments
+from dgp import Cell, draw_replication, assumed_u_moments, BASE_ENTROPY, _key
 from estimators import ESTIMATOR_NAMES, fit_all
 
 Z95 = 1.959963984540054
@@ -24,13 +24,19 @@ PAIRS = (
     ('naive_pmm2', 'naive_ls'),
     ('ref_pmm2', 'ref_ls'),
 )
+EXTRA_PAIRS = (                                # only when 'simex_ls' is computed
+    ('simex_ls', 'tc_ls'),
+    ('tc_pmm2star_oracle', 'simex_ls'),
+)
 
 
-def run_cell(cell: Cell, n_rep: int) -> dict:
-    """Returns raw per-replication estimates plus aggregated metrics."""
+def run_cell(cell: Cell, n_rep: int, extra: tuple = ()) -> dict:
+    """Returns raw per-replication estimates plus aggregated metrics.
+    extra: additional estimator names (robustness run: ('simex_ls',))."""
+    names = tuple(ESTIMATOR_NAMES) + tuple(extra)
     eps_mom = cell.eps.moments
     truth = np.array([cell.b0, cell.b1])
-    k = len(ESTIMATOR_NAMES)
+    k = len(names)
     beta = np.full((n_rep, k, 2), np.nan)
     se = np.full((n_rep, k, 2), np.nan)
     conv = np.zeros((n_rep, k), dtype=bool)
@@ -42,8 +48,11 @@ def run_cell(cell: Cell, n_rep: int) -> dict:
     for r in range(n_rep):
         d = draw_replication(cell, r)
         nu = assumed_u_moments(cell, r)
-        fits = fit_all(d['y'], d['w'], d['x'], eps_mom, nu, sx2_true=VAR_X)
-        for j, nm in enumerate(ESTIMATOR_NAMES):
+        simex_rng = (np.random.default_rng(np.random.SeedSequence(
+            [BASE_ENTROPY, _key('simex'), _key(cell.cell_id), r])) if extra else None)
+        fits = fit_all(d['y'], d['w'], d['x'], eps_mom, nu, sx2_true=VAR_X,
+                       extra=extra, simex_rng=simex_rng)
+        for j, nm in enumerate(names):
             f = fits[nm]
             beta[r, j] = f.beta
             se[r, j] = f.se
@@ -54,18 +63,18 @@ def run_cell(cell: Cell, n_rep: int) -> dict:
                     so.get('star_fallback', 0), sa.get('star_fallback', 0))
         star_t[r] = (so.get('star_t', np.nan), sa.get('star_t', np.nan))
 
-    return dict(cell=cell, n_rep=n_rep, beta=beta, se=se, conv=conv, flags=flags,
-                star_t=star_t, truth=truth,
-                summary=_summarise(cell, beta, se, conv, flags, star_t, truth, n_rep),
-                paired=_paired(cell, beta, conv, truth, n_rep))
+    return dict(cell=cell, n_rep=n_rep, names=names, beta=beta, se=se, conv=conv,
+                flags=flags, star_t=star_t, truth=truth,
+                summary=_summarise(cell, beta, se, conv, flags, star_t, truth, n_rep, names),
+                paired=_paired(cell, beta, conv, truth, n_rep, names))
 
 
 # --------------------------------------------------------------------------
-def _summarise(cell, beta, se, conv, flags, star_t, truth, m):
+def _summarise(cell, beta, se, conv, flags, star_t, truth, m, names=ESTIMATOR_NAMES):
     from estimators import theory_are
     th = theory_are(cell)
     rows = []
-    for j, nm in enumerate(ESTIMATOR_NAMES):
+    for j, nm in enumerate(names):
         for p, pname in ((0, 'b0'), (1, 'b1')):
             est = beta[:, j, p]
             ok = np.isfinite(est)
@@ -80,6 +89,7 @@ def _summarise(cell, beta, se, conv, flags, star_t, truth, m):
             rows.append(dict(
                 cell_id=cell.cell_id, eps_key=cell.eps_key, u_family=cell.u_family,
                 lam=cell.lam, n=cell.n, b1_true=cell.b1, delta=cell.delta,
+                x_family=cell.x_family,
                 g2_theory=cell.eps.moments['g2'], m_rep=m,
                 estimator=nm, param=pname,
                 n_finite=int(ok.sum()),
@@ -107,13 +117,14 @@ def _summarise(cell, beta, se, conv, flags, star_t, truth, m):
     return rows
 
 
-def _paired(cell, beta, conv, truth, m):
+def _paired(cell, beta, conv, truth, m, names=ESTIMATOR_NAMES):
     from estimators import theory_are
     th = theory_are(cell)
-    idx = {nm: j for j, nm in enumerate(ESTIMATOR_NAMES)}
+    idx = {nm: j for j, nm in enumerate(names)}
+    pairs = PAIRS + (EXTRA_PAIRS if 'simex_ls' in idx else ())
     rows = []
     rng = np.random.default_rng(991)
-    for a, b in PAIRS:
+    for a, b in pairs:
         for p, pname in ((0, 'b0'), (1, 'b1')):
             ea = beta[:, idx[a], p] - truth[p]
             eb = beta[:, idx[b], p] - truth[p]
@@ -134,6 +145,7 @@ def _paired(cell, beta, conv, truth, m):
             rows.append(dict(
                 cell_id=cell.cell_id, eps_key=cell.eps_key, u_family=cell.u_family,
                 lam=cell.lam, n=cell.n, b1_true=cell.b1, delta=cell.delta,
+                x_family=cell.x_family,
                 g2_theory=cell.eps.moments['g2'], m_rep=m, n_paired=n_ok,
                 estimator_a=a, estimator_b=b, param=pname,
                 mse_a=float(sa.mean()) if n_ok else np.nan,

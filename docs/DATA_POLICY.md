@@ -39,7 +39,7 @@ from the raw sources.
 
 The run manifests and gate reports record the absolute path and interpreter of
 the machine that produced them. Those strings were rewritten to `<repo>` and
-`<home>` before publication — 18 lines across 14 files, all of them path
+`<home>` before publication — 19 lines across 15 files, all of them path
 metadata. No number, seed, digest or result was touched. The parent repository
 retains the originals.
 

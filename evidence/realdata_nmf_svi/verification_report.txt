@@ -18,6 +18,13 @@
   screen FAILS (|z|>=2): 129 cells, 43% within 2 SE of gold, median dev 2.55
   out-of-sample only    :  24 passing cells, 92% within 2 SE
 
+-- Gate N2b: the same screen from the OBSERVABLES only (Lemma testable) --
+  z_obs = sqrt(n) corr(W, delta_TCLS^2); verdict agrees with the reference-covariate screen in 99.4% of the 154 cells (corr of the two z = 0.9971); over all 462 cells 85.7%
+  screen PASSES (|z_obs|<2):  24 cells, 96% within 2 SE of gold, median dev 0.30
+  screen FAILS (|z_obs|>=2): 130 cells, 43% within 2 SE of gold, median dev 2.49
+  out-of-sample only       :  23 passing cells, 96% within 2 SE
+  TC-LS within 2 SE in 100% of passing and 100% of failing cells
+
 -- Gate N3: the bias formula E[Psi1] = -b Cov(X,eps^2) --
   on the White_NH grid (154 cells): corr = 0.9935, slope = 1.0121
   all cells with lambda >= 0.5 (350): corr = 0.9500, slope = 1.1202
@@ -43,7 +50,7 @@
 -- headline cell: Michigan / Black_NH / EP_MOBILE --
   n=1048 counties=74 lambda=0.6768 varsigma=0.030
   eps: c3=+2.127 c4=+8.426 -> g2=0.5662, g2_EIV=0.5766
-  screen z(Cov(X,eps^2)) = -0.001  (condition not rejected)
+  screen z(Cov(X,eps^2)) = -0.001  (condition not rejected); observable-only z_obs = -0.232
   beta1: gold=-0.003847 naive=-0.002481 tc_ls=-0.003699 star=-0.003567
   |gold-star|/se = 0.41   |gold-naive|/se = 1.61
   Var(star)/Var(tc_ls) = 0.6337  vs predicted g2_EIV 0.5766

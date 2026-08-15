@@ -301,6 +301,44 @@ def fit_tc_pmm2_star(y, wt, m2, m3, m4, nu, sx2, beta_init, name, info=None) -> 
 
 
 # --------------------------------------------------------------------------
+# SIMEX (Cook & Stefanski 1994) on the least-squares slope -- an external
+# baseline for the robustness run (2026-08-15).  Same information regime as
+# TC-LS (nu2 only): Gaussian pseudo-errors of variance zeta*nu2 are added, the
+# naive LS slope is averaged over B pseudo-samples at each zeta, and a
+# quadratic in zeta is extrapolated to zeta = -1.  For the linear model the
+# exact extrapolant is rational, so quadratic SIMEX is approximately, not
+# exactly, consistent -- which is why it is a baseline and not a competitor to
+# the exactly unbiased corrected scores.  Its pseudo-errors come from a
+# dedicated generator, so the CRN draws of every other estimator are untouched.
+# --------------------------------------------------------------------------
+SIMEX_ZETAS = (0.5, 1.0, 1.5, 2.0)
+SIMEX_B = 100
+EXTRA_ESTIMATOR_NAMES = ('simex_ls',)
+
+
+def fit_simex_ls(y, w, nu2, rng, name='simex_ls',
+                 zetas=SIMEX_ZETAS, b_pseudo=SIMEX_B) -> Fit:
+    n = y.size
+    zs = [0.0] + list(zetas)
+    means = np.empty((len(zs), 2))
+    means[0] = fit_ls(y, w, 'naive_ls').beta
+    sd = np.sqrt(max(nu2, 0.0))
+    for i, z in enumerate(zetas, start=1):
+        acc = np.zeros(2)
+        for _ in range(b_pseudo):
+            wz = w + np.sqrt(z) * sd * rng.standard_normal(n)
+            acc += fit_ls(y, wz, 'naive_ls').beta
+        means[i] = acc / b_pseudo
+    zs = np.asarray(zs)
+    beta = np.empty(2)
+    for p in range(2):
+        coef = np.polyfit(zs, means[:, p], 2)          # quadratic extrapolant
+        beta[p] = np.polyval(coef, -1.0)
+    ok = bool(np.all(np.isfinite(beta)))
+    return Fit(name, beta, np.full(2, np.nan), ok, 0, dict(simex_B=b_pseudo))
+
+
+# --------------------------------------------------------------------------
 # full estimator suite for one replication (CRN: all see the same data)
 # --------------------------------------------------------------------------
 ESTIMATOR_NAMES = ('naive_ls', 'naive_pmm2', 'tc_ls',
@@ -309,12 +347,15 @@ ESTIMATOR_NAMES = ('naive_ls', 'naive_pmm2', 'tc_ls',
                    'ref_ls', 'ref_pmm2')
 
 
-def fit_all(y, w, x_true, eps_moments, nu_assumed, sx2_true=1.0) -> dict[str, Fit]:
+def fit_all(y, w, x_true, eps_moments, nu_assumed, sx2_true=1.0,
+            extra=(), simex_rng=None) -> dict[str, Fit]:
     """eps_moments: dict(m2,m3,m4) TRUE moments of eps (oracle / reference).
     nu_assumed: dict(nu2..nu6) moments of U handed to the estimators
     (true in the oracle branch, perturbed in the sensitivity branch).
     sx2_true: var(X), used by the oracle TC-PMM2* weight; the adaptive variant
-    estimates it as var(Wt) - nu2."""
+    estimates it as var(Wt) - nu2.
+    extra: additional estimator names to compute ('simex_ls'); simex_rng is the
+    dedicated generator for the SIMEX pseudo-errors."""
     m2, m3, m4 = eps_moments['m2'], eps_moments['m3'], eps_moments['m4']
     nu2, nu3, nu4 = nu_assumed['nu2'], nu_assumed['nu3'], nu_assumed['nu4']
     out: dict[str, Fit] = {}
@@ -360,6 +401,10 @@ def fit_all(y, w, x_true, eps_moments, nu_assumed, sx2_true=1.0) -> dict[str, Fi
     out['ref_ls'] = f_ref
     out['ref_pmm2'] = fit_tc_pmm2(y, x_true, m2, m3, m4, 0.0, 0.0,
                                   f_ref.beta, 'ref_pmm2')
+
+    # 7. optional external baseline (robustness run only)
+    if 'simex_ls' in extra:
+        out['simex_ls'] = fit_simex_ls(y, w, nu2, simex_rng or np.random.default_rng(0))
     return out
 
 

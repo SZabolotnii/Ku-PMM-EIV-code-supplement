@@ -162,6 +162,29 @@
       "aggregation": "none; one row per cell, values copied verbatim. RE values above 1 (TC-PMM2 worse than TC-LS) are set in bold.",
       "rows": 36
     },
+    "tab_robustness.tex": {
+      "what": "Measured relative efficiency against TC-LS for the fixed-weight, oracle and adaptive TC-PMM2 estimators and for a quadratic SIMEX baseline, with the closed-form ARE*, under three latent-covariate laws with the same mean and variance; last column is the empirical 95% sandwich coverage of the adaptive TC-PMM2*.",
+      "sources": [
+        {
+          "file": "evidence/robustness/paired.csv",
+          "filter": "param='b1'; n=1000; b1_true=1; estimator_b='tc_ls'; estimator_a in {tc_pmm2_oracle, tc_pmm2star_oracle, tc_pmm2star_adaptive, simex_ls}",
+          "columns": [
+            "re",
+            "se_re",
+            "are_star_theory"
+          ]
+        },
+        {
+          "file": "evidence/robustness/summary.csv",
+          "filter": "param='b1'; estimator='tc_pmm2star_adaptive'",
+          "columns": [
+            "coverage"
+          ]
+        }
+      ],
+      "rows": 12,
+      "aggregation": "none; values are rounded to four decimals (coverage to one decimal in per cent)."
+    },
     "tab_validation.tex": "evidence/realdata_nmf_svi/summary.json"
   },
   "_about": "Audit trail for the figures and tables of the TC-PMM2 EIV paper. Every entry names the evidence files a panel or column was read from and the filter applied. Produced by scripts/make_figures.py and scripts/make_tables.py; nothing here is computed from raw data or typed by hand.",

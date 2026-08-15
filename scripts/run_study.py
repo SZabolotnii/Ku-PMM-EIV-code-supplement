@@ -8,6 +8,11 @@ Modes
   negative_nu3   M = 2000, LEFT-skewed U (nu3 < 0): mirror of the confirmatory
                  main grid + the NHANES application regime                (2026-08-15)
   asymptotics    closed-form ARE(lam) + lambda* (no replications)
+  robustness     M = 2000, c3 = 1.0, b1 = +1, n = 1000, both gamma U-designs,
+                 lam in {0.80, 0.95}, latent covariate X in {Gaussian, skewed
+                 gamma, Student t(5)} (same mean and variance), plus a SIMEX
+                 baseline; adaptive TC-PMM2* estimates sigma_x^2 as usual
+                 (2026-08-15, PaperMentor round-4 requests)
 
 Design factors (2026-08-14 amendment).  The U family is a MAIN factor, not a
 nuisance: 'gamma_wh' ties U's standardised shape to lam (the W&H 6.1 design --
@@ -103,6 +108,13 @@ def build_grid(mode: str) -> list[Cell]:
             for fam in U_MAIN:
                 for lam in (0.80, 0.95):
                     cells.append(make_cell('g_c3_1.0', fam, lam, 1000, delta=delta))
+    elif mode == 'robustness':
+        from dgp import X_FAMILIES
+        for xf in X_FAMILIES:
+            for fam in U_MAIN:
+                for lam in (0.80, 0.95):
+                    cells.append(make_cell('g_c3_1.0', fam, lam, 1000, b1=1.0,
+                                           x_family=xf))
     else:
         raise ValueError(mode)
     return cells
@@ -117,9 +129,9 @@ def git_hash() -> str:
 
 
 def _worker(args):
-    cell, m = args
+    cell, m, extra = args
     t0 = time.time()
-    res = run_cell(cell, m)
+    res = run_cell(cell, m, extra=extra)
     res['wall'] = time.time() - t0
     return res
 
@@ -138,7 +150,7 @@ def write_run(run_name, results, meta):
         for res in results:
             c = res['cell']
             for r in range(res['n_rep']):
-                for j, nm in enumerate(ESTIMATOR_NAMES):
+                for j, nm in enumerate(res.get('names', ESTIMATOR_NAMES)):
                     wr.writerow([c.cell_id, c.eps_key, c.u_family, c.lam, c.n, c.b1,
                                  c.delta, r, nm,
                                  f"{res['beta'][r, j, 0]:.10g}", f"{res['beta'][r, j, 1]:.10g}",
@@ -165,7 +177,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--mode', required=True,
                     choices=['quick', 'confirmatory', 'sensitivity', 'asymptotics',
-                             'lambda_star', 'negative_nu3'])
+                             'lambda_star', 'negative_nu3', 'robustness'])
     ap.add_argument('--reps', type=int, default=None,
                     help='override M (any reduction is recorded in the manifest)')
     ap.add_argument('--jobs', type=int, default=max(1, (os.cpu_count() or 2) - 1))
@@ -224,14 +236,15 @@ def main():
         return
 
     default_m = {'quick': 200, 'confirmatory': 2000, 'sensitivity': 2000,
-                 'lambda_star': 2000, 'negative_nu3': 2000}[args.mode]
+                 'lambda_star': 2000, 'negative_nu3': 2000, 'robustness': 2000}[args.mode]
     m = args.reps or default_m
     cells = build_grid(args.mode)
     run_name = args.run_name or args.mode
+    extra = ('simex_ls',) if args.mode == 'robustness' else ()
 
     print(f'mode={args.mode}  cells={len(cells)}  M={m}  jobs={args.jobs}')
     t0 = time.time()
-    tasks = [(c, m) for c in cells]
+    tasks = [(c, m, extra) for c in cells]
     if args.jobs > 1:
         with ProcessPoolExecutor(max_workers=args.jobs) as ex:
             results = list(ex.map(_worker, tasks))
@@ -245,7 +258,7 @@ def main():
         m_reduced=(m != default_m),
         reduction_reason=args.reduction_reason or ('none' if m == default_m else 'UNDOCUMENTED'),
         n_cells=len(cells), cells=[c.describe() for c in cells],
-        estimators=list(ESTIMATOR_NAMES),
+        estimators=list(ESTIMATOR_NAMES) + list(extra),
         base_entropy=20260814,
         seeding='SeedSequence([base, key(stream), key(cfg), n, rep]); CRN across '
                 'estimators within a replication; X,eps shared across lam',
