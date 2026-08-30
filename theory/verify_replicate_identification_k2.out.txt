@@ -1,0 +1,127 @@
+==============================================================================
+PART A -- symbolic derivation (sympy), independent of the manuscript
+==============================================================================
+
+[A1] Manuscript eq. (2.3)/(2.4): E[d^p] for the k-replicate design.
+    coefficient of nu3 in E[d^3] : (k - 2)*(k - 1)/k**2   -> k=2: 0, k=3: 2/9
+    coefficient of nu5 in E[d^5] : (k - 1)*((k - 1)**4 - 1)/k**5   -> k=2: 0, k=3: 10/81
+    Both vanish at k = 2.  The manuscript's ALGEBRA is correct;
+    what is tested below is its PREMISE that only d carries information.
+
+[A2] Joint central moments E[Wt1^a Wt2^b], a+b <= 6:
+    E[Wt1^2 Wt2^0] = mu2 + nu2
+    E[Wt1^1 Wt2^1] = mu2
+    E[Wt1^3 Wt2^0] = mu3 + nu3
+    E[Wt1^2 Wt2^1] = mu3
+    E[Wt1^4 Wt2^0] = 6*mu2*nu2 + mu4 + nu4
+    E[Wt1^3 Wt2^1] = 3*mu2*nu2 + mu4
+    E[Wt1^2 Wt2^2] = mu2*nu2 + mu2*nup2 + mu4 + nu2*nup2
+    E[Wt1^5 Wt2^0] = 10*mu2*nu3 + 10*mu3*nu2 + mu5 + nu5
+    E[Wt1^4 Wt2^1] = 4*mu2*nu3 + 6*mu3*nu2 + mu5
+    E[Wt1^3 Wt2^2] = mu2*nu3 + 3*mu3*nu2 + mu3*nup2 + mu5 + nu3*nup2
+    E[Wt1^6 Wt2^0] = 15*mu2*nu4 + 20*mu3*nu3 + 15*mu4*nu2 + mu6 + nu6
+    E[Wt1^5 Wt2^1] = 5*mu2*nu4 + 10*mu3*nu3 + 10*mu4*nu2 + mu6
+    E[Wt1^4 Wt2^2] = 6*mu2*nu2*nup2 + mu2*nu4 + 4*mu3*nu3 + 6*mu4*nu2 + mu4*nup2 + mu6 + nu4*nup2
+    E[Wt1^3 Wt2^3] = 9*mu2*nu2*nup2 + mu3*nu3 + mu3*nup3 + 3*mu4*nu2 + 3*mu4*nup2 + mu6 + nu3*nup3
+
+[A3] Master identity  E[Wt1^(p-1) (W1 - W2)] = sum_{j=2..p} C(p-1,j-1) mu_{p-j} nu_j
+    p=2: OK   E[Wt1^1 D] = nu2
+    p=3: OK   E[Wt1^2 D] = nu3
+    p=4: OK   E[Wt1^3 D] = 3*mu2*nu2 + nu4
+    p=5: OK   E[Wt1^4 D] = 6*mu2*nu3 + 4*mu3*nu2 + nu5
+    p=6: OK   E[Wt1^5 D] = 10*mu2*nu4 + 10*mu3*nu3 + 5*mu4*nu2 + nu6
+    -> master identity holds for p=2..6: True
+    NOTE: the right-hand side contains ONLY nu_j of U_1 (symbols nu*),
+          never nu'_j of U_2 (symbols nup*).  So U_2 need only be centred and
+          independent -- it need NOT have the same law as U_1.
+
+[A4] Solving the triangular system for mu_2..mu_6 and nu_2..nu_6:
+    nu_2 = E[Wt1^2] - E[Wt1^1 Wt2] - (0)
+    nu_3 = E[Wt1^3] - E[Wt1^2 Wt2] - (0)
+    nu_4 = E[Wt1^4] - E[Wt1^3 Wt2] - (3*mu2*nu2)
+    nu_5 = E[Wt1^5] - E[Wt1^4 Wt2] - (6*mu2*nu3 + 4*mu3*nu2)
+    nu_6 = E[Wt1^6] - E[Wt1^5 Wt2] - (10*mu2*nu4 + 10*mu3*nu3 + 5*mu4*nu2)
+    mu_2 = E[Wt1^1 Wt2] - (0)
+    mu_3 = E[Wt1^2 Wt2] - (0)
+    mu_4 = E[Wt1^3 Wt2] - (3*mu2*nu2)
+    mu_5 = E[Wt1^4 Wt2] - (4*mu2*nu3 + 6*mu3*nu2)
+    mu_6 = E[Wt1^5 Wt2] - (5*mu2*nu4 + 10*mu3*nu3 + 10*mu4*nu2)
+
+[A5] Uniqueness check -- sp.solve on the full order-<=6 system
+    number of solutions of the order-<=6 moment system: 0
+    NOT unique -- investigate
+
+[A6] Covariance form:  nu_3 = Cov(Wbar_i, D_i^2),  Wbar = (W1+W2)/2, D = W1-W2
+    E[(Wbar - E Wbar) D^2] = nu3/2 + nup3/2
+    equals nu3?  False   (with U_1, U_2 identically distributed: True)
+    E[(Wt1^4 - Wt2^4) D / 2] = 3*mu2*nu3 + 3*mu2*nup3 + 2*mu3*nu2 + 2*mu3*nup2 + nu5/2 + nup5/2
+    equals nu5 + 4 mu3 nu2 + 6 mu2 nu3 (U_1,U_2 iid)?  True
+
+==============================================================================
+PART B -- EXACT check by enumeration over finite supports (Fractions)
+==============================================================================
+    truth: E U = 1/10, nu2 = 249/100, nu3 = 669/125, nu4 = 242097/10000, nu5 = 558969/6250, nu6 = 70619349/200000
+    nu2: recovered 249/100  vs true 249/100   EXACT
+    nu3: recovered 669/125  vs true 669/125   EXACT
+    nu4: recovered 242097/10000  vs true 242097/10000   EXACT
+    nu5: recovered 558969/6250  vs true 558969/6250   EXACT
+    nu6: recovered 70619349/200000  vs true 70619349/200000   EXACT
+    mu2: recovered 37/4  vs true 37/4   EXACT
+    mu3: recovered 57/2  vs true 57/2   EXACT
+    mu4: recovered 3961/16  vs true 3961/16   EXACT
+    mu5: recovered 5655/4  vs true 5655/4   EXACT
+    mu6: recovered 613117/64  vs true 613117/64   EXACT
+    contrast: E[d^3] = 0, E[d^5] = 0  (identically 0 at k = 2, as the manuscript says)
+    => the information about nu3, nu5 is not in d; it is in the DEPENDENCE between the unit mean and the within-unit spread.
+    EXACT recovery of nu2..nu6 and mu2..mu6 from k = 2: True
+    U_2 given a DIFFERENT law (non-exchangeable replicates): nu of U_1 still recovered exactly: True
+      (e.g. nu3 = 669/125 vs true 669/125, nu5 = 558969/6250 vs true 558969/6250)
+
+==============================================================================
+PART C -- Monte Carlo, fresh design: 3 asymmetric U laws x skewed latent X
+==============================================================================
+
+  U ~ centred Gamma(0.8) (right-skewed, gamma3=+2.24)
+    true:  nu2=+0.8, nu3=+1.6, nu4=+6.72, nu5=+32, nu6=+186.88
+    nu2: mean      +0.7999  (MC se  0.000313)  true         +0.8   z =  -0.31  OK
+    nu3: mean      +1.5997  (MC se   0.00194)  true         +1.6   z =  -0.17  OK
+    nu4: mean      +6.7101  (MC se      0.02)  true        +6.72   z =  -0.49  OK
+    nu5: mean      +31.861  (MC se     0.237)  true          +32   z =  -0.59  OK
+    nu6: mean      +184.68  (MC se      2.97)  true      +186.88   z =  -0.74  OK
+
+  U ~ -1.3 x centred Gamma(2.0) (LEFT-skewed, gamma3=-1.41)
+    true:  nu2=+3.38, nu3=-8.788, nu4=+68.546, nu5=-475.26, nu6=+4247.6
+    nu2: mean      +3.3781  (MC se   0.00148)  true        +3.38   z =  -1.26  OK
+    nu3: mean      -8.7745  (MC se    0.0106)  true       -8.788   z =  +1.28  OK
+    nu4: mean      +68.486  (MC se     0.137)  true      +68.546   z =  -0.44  OK
+    nu5: mean      -475.52  (MC se      1.74)  true      -475.26   z =  -0.15  OK
+    nu6: mean      +4261.6  (MC se      27.1)  true      +4247.6   z =  +0.52  OK
+
+  U ~ asymmetric two-point p=0.15 on {3,-0.6} (gamma3=+1.94)
+    true:  nu2=+1.6524, nu3=+4.164, nu4=+13.224, nu5=+40.205, nu6=+123.17
+    nu2: mean      +1.6517  (MC se   0.00083)  true      +1.6524   z =  -0.85  OK
+    nu3: mean      +4.1657  (MC se   0.00255)  true       +4.164   z =  +0.63  OK
+    nu4: mean      +13.231  (MC se    0.0076)  true      +13.224   z =  +1.00  OK
+    nu5: mean      +40.315  (MC se    0.0437)  true      +40.205   z =  +2.54  OK
+    nu6: mean      +124.92  (MC se     0.748)  true      +123.17   z =  +2.35  OK
+
+==============================================================================
+PART D -- PRECISION of nu3-hat: k = 2 cross-moment route vs k = 3 deviation route
+        (matched TOTAL number of measurements N = k * n_units)
+==============================================================================
+    U = centred Gamma(0.8); nu2 = 0.8, nu3 = 1.6
+    X ~ Normal(0, sigma_x^2) with sigma_x^2 set by the reliability ratio lambda
+    N = 60000 measurements in total, 400 Monte Carlo repetitions
+
+     lambda   sd(nu3^) k=2   sd(nu3^) k=3  ratio k2/k3   |t| for nu3 at k=2
+       0.50        0.05508        0.06233         0.88                29.02
+       0.70        0.05465        0.05640         0.97                29.29
+       0.80        0.06106        0.05518         1.11                26.20
+       0.90        0.07653        0.05976         1.28                20.96
+       0.95        0.09987        0.05795         1.72                16.04
+
+    Reading: identification at k = 2 is exact; the PRICE is that the k = 2
+    estimator's sampling variance is driven by the moments of X (it is a
+    covariance against the unit level), whereas the k >= 3 estimator's variance
+    is driven by the moments of U only.  The cost grows with the reliability
+    ratio.  This is a precision statement, not an identification statement.

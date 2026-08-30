@@ -1,12 +1,20 @@
 """Identifiability of the measurement-error moments from k replicate measurements.
 
 Setting: unit i is measured k times, W_ij = X_i + U_ij, with U_ij iid, independent of X_i.
-The within-unit deviations d_ij = W_ij - Wbar_i = U_ij - Ubar_i remove X entirely, so any
-moment of U estimable without a gold standard must be a function of the law of d.
+The within-unit deviations d_ij = W_ij - Wbar_i = U_ij - Ubar_i remove X entirely; this
+script studies which moments of U the law of d alone determines (the differencing route).
 
-Claim (odd moments): for k = 2 the deviation vector is (D/2, -D/2) with D = U_1 - U_2
-symmetric, hence every odd moment of d vanishes identically whatever nu3 is. So paired
-replicates carry NO information about odd central moments of U. From k >= 3 they do.
+Claim (odd moments, differencing route): for k = 2 the deviation vector is (D/2, -D/2)
+with D = U_1 - U_2 symmetric, hence every odd moment of d vanishes identically whatever
+nu3 is. So the within-unit deviations carry NO information about odd central moments of
+U at k = 2; from k >= 3 they do.
+
+This is NOT an identification statement. The odd moments ARE identified at k = 2 through
+the paired cross-moments E[W1c^(p-1) D] (a triangular system in nu_j and the central
+moments mu_j of X): nu3 = Cov(Wbar, D^2). See verify_replicate_identification_k2.py in
+this directory (symbolic, exact-rational and Monte-Carlo confirmation), and Remark
+`rem:replicates` of the paper, corrected 2026-08-29. What k >= 3 buys is precision at high
+reliability, not identifiability.
 
 This script derives E[d^p] for p = 2,3,4,5 symbolically and confirms it by simulation.
 """
@@ -102,6 +110,7 @@ if __name__ == '__main__':
         print(f'  k={kk}:')
         for p in (2, 3, 4, 5):
             if rec[p] is None:
-                print(f'      nu{p}: NOT IDENTIFIED (coefficient vanishes identically at k=2)')
+                print(f'      nu{p}: NOT RECOVERABLE FROM d (coefficient vanishes identically at k=2); '
+                      f'see the paired cross-moment route in verify_replicate_identification_k2.py')
             else:
                 print(f'      nu{p} = {float(rec[p]):+8.4f}   (true {truth[p]:+8.4f})')

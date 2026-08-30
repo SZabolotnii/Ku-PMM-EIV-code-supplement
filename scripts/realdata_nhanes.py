@@ -7,9 +7,10 @@
 The three consecutive diastolic readings of the NHANES blood-pressure examination
 (BPXDI1..3, k = 3) identify the central moments nu_2..nu_6 of the measurement
 error from the within-subject deviations, which is the information the corrected
-degree-two score of this paper needs and which the ubiquitous two-replicate
-design cannot supply (Remark on replicate designs: the coefficient of nu_3
-carries a factor k-2).
+degree-two score of this paper needs. A two-replicate design recovers the odd
+moments too, but only through the paired cross-moments (Remark on replicate
+designs, corrected 2026-08-29; theory/verify_replicate_identification_k2.py):
+in the within-subject deviations the coefficient of nu_3 carries a factor k-2.
 
 Everything below is computed from the two public NHANES files; nothing is typed
 by hand.  Outputs go to evidence/realdata_nhanes/ and are never hand-edited.
@@ -66,11 +67,9 @@ DATA = ROOT / 'data' / 'nhanes'
 OUT = ROOT / 'evidence' / 'realdata_nhanes'
 BASE_URL = 'https://wwwn.cdc.gov/Nchs/Data/Nhanes/Public/2013/DataFiles/'
 
-# sha256 observed at the time of the source scouting (2026-08-14); the digest of
-# whatever is actually downloaded is written to evidence/realdata_nhanes/
-# manifest.json alongside it.  NHANES occasionally reissues a file; a mismatch
-# means a new revision, not a corrupt download, and is reported rather than
-# swallowed.
+# sha256 recorded in source_notes/REALDATA_CANDIDATES_2026-08-14.md at the time
+# of the source scouting.  NHANES occasionally reissues a file; a mismatch means
+# a new revision, not a corrupt download, and is reported rather than swallowed.
 EXPECTED_SHA256 = {
     'BPX_H.xpt': 'b6641efc30ac9b9de328dfbf4110d0d120439aadca2c2bc89f2e77310d1a0c8e',
     'BIOPRO_H.xpt': 'b114fde7fc46933e6b4e3f620b8e7b61ea5b46f82121c0dc05a7b8c1fbdd0548',
