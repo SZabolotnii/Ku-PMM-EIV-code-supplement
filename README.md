@@ -7,6 +7,11 @@ Public verification supplement for the manuscript:
 
 Repository: <https://github.com/SZabolotnii/Ku-PMM-EIV-code-supplement>
 
+Archived on Zenodo: release v1.0.0 is
+[doi:10.5281/zenodo.23482300](https://doi.org/10.5281/zenodo.23482300); the concept DOI
+[10.5281/zenodo.23482299](https://doi.org/10.5281/zenodo.23482299) always resolves to the
+latest release.
+
 Release v1.0.0 is the state cited by the shortened version of the manuscript (21 pages in
 the journal's review format, with a 31-page Supplementary Material). Earlier commits served longer
 versions of the same manuscript; section and figure numbers below refer to v1.0.0.

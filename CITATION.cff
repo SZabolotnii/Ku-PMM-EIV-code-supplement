@@ -8,6 +8,14 @@ authors:
     affiliation: "Cherkasy State Business College, Cherkasy, Ukraine"
 version: "1.0.0"
 date-released: "2026-10-19"
+doi: "10.5281/zenodo.23482300"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.23482300"
+    description: "Zenodo archive of release v1.0.0"
+  - type: doi
+    value: "10.5281/zenodo.23482299"
+    description: "Zenodo concept DOI (all versions, resolves to the latest)"
 license: MIT
 repository-code: "https://github.com/SZabolotnii/Ku-PMM-EIV-code-supplement"
 url: "https://github.com/SZabolotnii/Ku-PMM-EIV-code-supplement"
