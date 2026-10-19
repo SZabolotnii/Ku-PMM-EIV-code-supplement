@@ -930,13 +930,24 @@ def make_validation_figure():
     # Both axes are in units of 1e-3, so the tick labels stay short enough to
     # read; the raw slopes are of order 1e-3 in these regressions.
     K = 1e3
+    lim = K * max(abs(r['pred_bias']) for r in hi) * 1.15
+    # Points outside the range are clipped from view anyway; leaving them in the
+    # PDF puts their marker paths off the page. Drop them here and keep the
+    # count the caption states.
+    inside = [r for r in rows
+              if K * abs(r['pred_bias']) <= lim and K * abs(r['obs_bias']) <= lim]
+    omitted_hi = sum(1 for r in hi if r not in inside)
+    omitted_lo = sum(1 for r in lo if r not in inside)
+    print(f'  fig8 (a): {omitted_lo} cells with lam < 0.5 and {omitted_hi} with '
+          f'lam >= 0.5 lie outside the plotted range and are not drawn')
+    hi = [r for r in hi if r in inside]
+    lo = [r for r in lo if r in inside]
     ax.scatter([K * r['pred_bias'] for r in lo], [K * r['obs_bias'] for r in lo],
                s=9, facecolors='none', edgecolors='0.62', linewidths=0.6,
                label=r'$\lambda < 0.5$', zorder=2)
     ax.scatter([K * r['pred_bias'] for r in hi], [K * r['obs_bias'] for r in hi],
                s=9, color='#1f4e79', alpha=0.75, linewidths=0,
                label=r'$\lambda \geq 0.5$', zorder=3)
-    lim = K * max(abs(r['pred_bias']) for r in hi) * 1.15
     ax.plot([-lim, lim], [-lim, lim], color='#b03a2e', lw=1.0, ls='--',
             zorder=4, label='identity')
     ax.set_xlim(-lim, lim); ax.set_ylim(-lim, lim)

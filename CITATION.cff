@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this verification package, please cite the paper."
+title: "Verification package: Optimal weighting of corrected degree-two scores in errors-in-variables models"
+authors:
+  - family-names: Zabolotnii
+    given-names: Serhii
+    orcid: "https://orcid.org/0000-0003-0242-2234"
+    affiliation: "Cherkasy State Business College, Cherkasy, Ukraine"
+version: "1.0.0"
+date-released: "2026-10-19"
+license: MIT
+repository-code: "https://github.com/SZabolotnii/Ku-PMM-EIV-code-supplement"
+url: "https://github.com/SZabolotnii/Ku-PMM-EIV-code-supplement"
+keywords:
+  - errors-in-variables
+  - corrected score
+  - measurement error
+  - polynomial maximization method
+  - second-order least squares
+  - Monte Carlo simulation

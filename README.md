@@ -2,9 +2,14 @@
 
 Public verification supplement for the manuscript:
 
-**Optimal weighting of corrected scores in errors-in-variables models within the
-degree-two estimating-function class**
-*Serhii Zabolotnii*
+**Optimal weighting of corrected degree-two scores in errors-in-variables models**
+*Serhii Zabolotnii and Vladyslav Khotunov*
+
+Repository: <https://github.com/SZabolotnii/Ku-PMM-EIV-code-supplement>
+
+Release v1.0.0 is the state cited by the shortened version of the manuscript (21 pages in
+the journal's review format, with a 31-page Supplementary Material). Earlier commits served longer
+versions of the same manuscript; section and figure numbers below refer to v1.0.0.
 
 ## What this repository is for
 
@@ -20,7 +25,7 @@ Start here:
 python scripts/verify_reported_values.py
 ```
 
-It re-computes 43 headline numbers from `evidence/` and compares each against the
+It re-computes 76 reported numbers from `evidence/` and compares each against the
 value printed in the manuscript, at the precision the manuscript prints it. It
 needs no simulation, no network and no R.
 
@@ -33,8 +38,9 @@ python scripts/verify.py --run confirmatory      # exits 1, by design
 **Three of the ten pre-registered gates fail, and that is the manuscript's own
 reported result**, not a broken supplement. G2 (measured versus closed-form
 efficiency) passes 133/144 sub-checks, G3 (cost of adaptive weights) 94/96, and
-G6 (heavy-tailed lognormal measurement error) 52/72; the paper analyses all three
-failures in its Section 8.9 rather than hiding them. `verify.py` therefore exits
+G6 (heavy-tailed lognormal measurement error) 52/72; the paper reports all three
+failures in Table 2 and Section 4.4 ("What failed"), with the detail in Sections
+S2.10–S2.11 of its Supplementary Material, rather than hiding them. `verify.py` therefore exits
 non-zero, and `verify_reported_values.py` asserts that the failures are *exactly*
 those counts — a supplement in which the gates silently passed would be the
 suspicious one.
@@ -47,7 +53,7 @@ suspicious one.
 | `scripts/verify.py` | the pre-registered gates G0–G6 over a stored run |
 | `scripts/run_study.py` | the Monte Carlo driver (regenerates `evidence/<run>/`) |
 | `scripts/dgp.py`, `estimators.py`, `mc_engine.py` | data-generating processes, the five estimators, the replication loop with common random numbers |
-| `scripts/make_tables.py`, `make_figures.py` | regenerate every manuscript table and figure into `output/` |
+| `scripts/make_tables.py`, `make_figures.py` | regenerate every manuscript table and figure into `output/` (article Figure 1 = `fig1_are_theory_vs_mc.pdf`, Figure 2 = `fig8_validation.pdf`; the others belong to the Supplementary Material) |
 | `scripts/realdata_*.py` | the three real-data studies (data are downloaded, not redistributed — see `docs/DATA_POLICY.md`) |
 | `scripts/oracle_check.R` | gate G0 only: cross-check against the R package `EstemPMM` |
 | `theory/` | the symbolic derivation, an independent numerical cross-check, the generated closed forms, and the replicate-identification argument |
